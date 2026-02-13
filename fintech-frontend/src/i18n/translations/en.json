@@ -34,7 +34,9 @@
     "title": "Main Dashboard",
     "createCreditRequest": "Create Credit Request",
     "description": "Manage your credit requests and track their status",
-    "startNewRequest": "Start a new credit request"
+    "startNewRequest": "Start a new credit request",
+    "searchCreditRequests": "Search Credit Requests",
+    "searchDescription": "Search and filter your credit requests"
   },
   "header": {
     "logout": "Logout",
@@ -43,6 +45,12 @@
   "common": {
     "loading": "Loading..."
   },
+  "errors": {
+    "mustBeLoggedIn": "You must be logged in",
+    "sessionExpired": "Your session has expired. Please log in again.",
+    "userNotFound": "User not found",
+    "getUserFailed": "Error getting user information"
+  },
   "creditRequest": {
     "createTitle": "Create Credit Request",
     "country": "Country",
@@ -50,7 +58,7 @@
     "fullName": "Full Name",
     "fullNamePlaceholder": "Enter your full name",
     "identityDocument": "Identity Document",
-    "identityDocumentPlaceholder": "Enter your identity document",
+    "identityDocumentPlaceholder": "Enter identity document",
     "requestedAmount": "Requested Amount",
     "requestedAmountPlaceholder": "Enter the amount you want to request",
     "monthlyIncome": "Monthly Income",
@@ -58,13 +66,54 @@
     "submit": "Create Request",
     "cancel": "Cancel",
     "successMessage": "Credit request created successfully!",
+    "searchTitle": "Search Credit Requests",
+    "filterByCountry": "Filter by Country",
+    "filterByIdentityDocument": "Filter by identity document",
+    "filterByStatus": "Filter by Status",
+    "allStatuses": "All Statuses",
+    "resetFilters": "Reset",
+    "search": "Search",
+    "listTitle": "Credit Requests",
+    "backToHome": "Back to Home",
+    "noResults": "No results found",
+    "noResultsDescription": "No credit requests match the selected filters.",
+    "searchError": "Error searching credit requests",
+    "status": {
+      "_label": "Status",
+      "pending": "Pending",
+      "in_review": "In Review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "requestDate": "Request Date",
+    "showingResults": "Showing {{from}} to {{to}} of {{total}} results",
+    "pageOf": "Page {{page}} of {{total}}",
+    "previous": "Previous",
+    "next": "Next",
+    "detailTitle": "Credit Request Details",
+    "viewDetail": "View Detail",
+    "actions": "Actions",
+    "approve": "Approve",
+    "reject": "Reject",
+    "bankInformation": "Bank Information",
+    "bankName": "Bank",
+    "accountNumber": "Account Number",
+    "statusUpdate": {
+      "approved": "Request approved successfully",
+      "rejected": "Request rejected"
+    },
     "errors": {
       "countryRequired": "You must select a country",
       "fullNameRequired": "Full name is required",
       "identityDocumentRequired": "Identity document is required",
       "amountRequired": "Requested amount must be greater than 0",
       "incomeRequired": "Monthly income must be greater than 0",
-      "createFailed": "Error creating credit request"
+      "createFailed": "Error creating credit request",
+      "getAllFailed": "Error retrieving credit requests",
+      "getByIdFailed": "Error retrieving credit request",
+      "searchFailed": "Error searching credit requests",
+      "updateFailed": "Error updating credit request"
     }
   }
 }

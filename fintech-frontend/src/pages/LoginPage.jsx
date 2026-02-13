@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "../i18n/I18nContext";
 import { useAuth } from "../context/AuthContext";
+import { translateError } from "../utils/errorTranslator";
 import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
@@ -23,7 +24,8 @@ export default function LoginPage({ onNavigate }) {
       await login(email, password);
       // Redirect will happen automatically via AuthContext
     } catch (err) {
-      setError(err.message || t("login.error"));
+      const errorMessage = translateError(err.message, t);
+      setError(errorMessage || t("login.error"));
     } finally {
       setIsLoading(false);
     }

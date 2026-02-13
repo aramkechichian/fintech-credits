@@ -174,8 +174,17 @@ export const authApi = {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: "Error getting user" }));
-      throw new Error(error.detail || error.message || "Error getting user");
+      // Handle 401 (unauthorized) - token expired or invalid
+      if (response.status === 401) {
+        localStorage.removeItem("access_token");
+        // Don't throw error here, just return null so the app can handle it gracefully
+        return null;
+      }
+      
+      const error = await response.json().catch(() => ({ detail: "Error al obtener información del usuario" }));
+      throw new Error(error.detail && !error.detail.includes("Could not validate")
+        ? error.detail 
+        : "Error al obtener información del usuario");
     }
 
     return await response.json();

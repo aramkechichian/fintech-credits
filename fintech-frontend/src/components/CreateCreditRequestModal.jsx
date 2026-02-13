@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "../i18n/I18nContext";
+import { translateError } from "../utils/errorTranslator";
 import Modal from "./ui/Modal";
 import Input from "./ui/Input";
 import Button from "./ui/Button";
@@ -91,7 +92,8 @@ export default function CreateCreditRequestModal({ isOpen, onClose, onSuccess })
         onSuccess();
       }
     } catch (err) {
-      setError(err.message || t("creditRequest.errors.createFailed"));
+      const errorMessage = translateError(err.message, t);
+      setError(errorMessage || t("creditRequest.errors.createFailed"));
     } finally {
       setIsLoading(false);
     }

@@ -1,18 +1,22 @@
-from fastapi import APIRouter, HTTPException, Depends, status
-from typing import List
+from fastapi import APIRouter, HTTPException, Depends, status, Query
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
+from typing import List, Optional
 import logging
 from app.models.credit_request import (
     CreditRequestCreate,
     CreditRequestResponse,
     CreditRequestStatus,
-    BankInformation
+    BankInformation,
+    CreditRequestUpdate
 )
 from app.models.user import UserInDB
 from app.services.credit_request_service import (
     create_credit_request,
     get_credit_request_by_id,
     get_user_credit_requests,
-    update_credit_request_status
+    update_credit_request_status,
+    search_credit_requests
 )
 from app.services.log_service import log_request
 from app.controllers.auth_controller import get_current_user_dependency
@@ -135,6 +139,206 @@ async def get_my_requests(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error retrieving credit requests"
+        )
+
+@router.get("/search", response_model=dict)
+async def search_requests(
+    current_user: UserInDB = Depends(get_current_user_dependency),
+    countries: Optional[List[str]] = Query(None, description="Filter by countries"),
+    identity_document: Optional[str] = Query(None, description="Filter by identity document (partial match)"),
+    status_filter: Optional[str] = Query(None, alias="status", description="Filter by status"),
+    page: int = Query(1, ge=1, description="Page number"),
+    limit: int = Query(20, ge=1, le=100, description="Items per page")
+):
+    """Search credit requests with filters and pagination"""
+    try:
+        skip = (page - 1) * limit
+        
+        requests, total_count = await search_credit_requests(
+            user_id=str(current_user.id),
+            countries=countries,
+            identity_document=identity_document,
+            status=status_filter,
+            skip=skip,
+            limit=limit
+        )
+        
+        # Log the search
+        await log_request(
+            endpoint="/credit-requests/search",
+            method="GET",
+            user_id=str(current_user.id),
+            payload={
+                "countries": countries,
+                "identity_document": identity_document,
+                "status": status_filter,
+                "page": page,
+                "limit": limit
+            },
+            response_status=200,
+            is_success=True
+        )
+        
+        return {
+            "items": [
+                CreditRequestResponse(
+                    id=str(req.id),
+                    user_id=str(req.user_id),
+                    country=req.country,
+                    currency_code=req.currency_code,
+                    full_name=req.full_name,
+                    identity_document=req.identity_document,
+                    requested_amount=req.requested_amount,
+                    monthly_income=req.monthly_income,
+                    request_date=req.request_date,
+                    status=req.status,
+                    bank_information=req.bank_information,
+                    created_at=req.created_at,
+                    updated_at=req.updated_at
+                )
+                for req in requests
+            ],
+            "total": total_count,
+            "page": page,
+            "limit": limit,
+            "total_pages": (total_count + limit - 1) // limit if limit > 0 else 0
+        }
+    except Exception as e:
+        logger.error(f"Error searching credit requests: {str(e)}", exc_info=True)
+        # Log error
+        await log_request(
+            endpoint="/credit-requests/search",
+            method="GET",
+            user_id=str(current_user.id),
+            payload={
+                "countries": countries,
+                "identity_document": identity_document,
+                "status": status_filter,
+                "page": page,
+                "limit": limit
+            },
+            response_status=500,
+            is_success=False,
+            error_message=str(e)
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error searching credit requests"
+        )
+
+@router.put("/{request_id}")
+async def update_request(
+    request_id: str,
+    update_data: CreditRequestUpdate,
+    current_user: UserInDB = Depends(get_current_user_dependency)
+):
+    """Update a credit request (status and/or bank information)"""
+    try:
+        # Get the existing request
+        credit_request = await get_credit_request_by_id(request_id)
+        
+        if not credit_request:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Credit request not found"
+            )
+        
+        # Verify the request belongs to the current user
+        if str(credit_request.user_id) != str(current_user.id):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You don't have permission to update this credit request"
+            )
+        
+        # Prepare update data
+        new_status = update_data.status if update_data.status else credit_request.status
+        bank_info = update_data.bank_information if update_data.bank_information else credit_request.bank_information
+        
+        # Update the request
+        updated_request = await update_credit_request_status(
+            request_id=request_id,
+            new_status=new_status,
+            bank_information=bank_info
+        )
+        
+        if not updated_request:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error updating credit request"
+            )
+        
+        # Log the update
+        await log_request(
+            endpoint=f"/credit-requests/{request_id}",
+            method="PUT",
+            user_id=str(current_user.id),
+            payload=update_data.model_dump(),
+            response_status=200,
+            is_success=True
+        )
+        
+        # TODO: Send email notification to user when status changes to approved or rejected
+        # if new_status in [CreditRequestStatus.APPROVED, CreditRequestStatus.REJECTED]:
+        #     from app.repositories.user_repository import user_repository
+        #     user = await user_repository.get_by_id(str(updated_request.user_id))
+        #     if user:
+        #         await send_email(
+        #             to=user.email,
+        #             subject=f"Credit Request {new_status.value}",
+        #             body=f"Your credit request has been {new_status.value}."
+        #         )
+        
+        # Determine message based on status - always return a message
+        message = None
+        if new_status == CreditRequestStatus.APPROVED:
+            message = "Solicitud de crédito aprobada exitosamente"
+        elif new_status == CreditRequestStatus.REJECTED:
+            message = "Solicitud de crédito rechazada"
+        else:
+            message = "Solicitud de crédito actualizada exitosamente"
+        
+        response_data = CreditRequestResponse(
+            id=str(updated_request.id),
+            user_id=str(updated_request.user_id),
+            country=updated_request.country,
+            currency_code=updated_request.currency_code,
+            full_name=updated_request.full_name,
+            identity_document=updated_request.identity_document,
+            requested_amount=updated_request.requested_amount,
+            monthly_income=updated_request.monthly_income,
+            request_date=updated_request.request_date,
+            status=updated_request.status,
+            bank_information=updated_request.bank_information,
+            created_at=updated_request.created_at,
+            updated_at=updated_request.updated_at
+        )
+        
+        # Always return response with message
+        # Use model_dump with mode='json' to serialize datetime objects to ISO strings
+        return JSONResponse(
+            status_code=200,
+            content={
+                "message": message,
+                "data": response_data.model_dump(mode='json')
+            }
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating credit request: {str(e)}", exc_info=True)
+        # Log error
+        await log_request(
+            endpoint=f"/credit-requests/{request_id}",
+            method="PUT",
+            user_id=str(current_user.id),
+            payload=update_data.model_dump() if update_data else None,
+            response_status=500,
+            is_success=False,
+            error_message=str(e)
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error updating credit request"
         )
 
 @router.get("/{request_id}", response_model=CreditRequestResponse)

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "../i18n/I18nContext";
 import { authApi } from "../api/authApi";
+import { translateError } from "../utils/errorTranslator";
 import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
@@ -39,7 +40,8 @@ export default function RegisterPage({ onNavigate }) {
         onNavigate("login");
       }
     } catch (err) {
-      setError(err.message || t("register.error"));
+      const errorMessage = translateError(err.message, t);
+      setError(errorMessage || t("register.error"));
     } finally {
       setIsLoading(false);
     }

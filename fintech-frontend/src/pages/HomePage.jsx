@@ -4,25 +4,34 @@ import { useAuth } from "../context/AuthContext";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import CreateCreditRequestModal from "../components/CreateCreditRequestModal";
+import SearchCreditRequestsModal from "../components/SearchCreditRequestsModal";
 import Toast from "../components/ui/Toast";
 
 export default function HomePage() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [toast, setToast] = useState({ isVisible: false, message: "", type: "success" });
 
   const handleCreateCreditRequest = () => {
-    console.log("Opening modal...");
-    setIsModalOpen(true);
+    setIsCreateModalOpen(true);
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
+  const handleSearchCreditRequests = () => {
+    setIsSearchModalOpen(true);
+  };
+
+  const handleCreateModalClose = () => {
+    setIsCreateModalOpen(false);
+  };
+
+  const handleSearchModalClose = () => {
+    setIsSearchModalOpen(false);
   };
 
   const handleSuccess = () => {
-    setIsModalOpen(false);
+    setIsCreateModalOpen(false);
     setToast({
       isVisible: true,
       message: t("creditRequest.successMessage"),
@@ -73,12 +82,49 @@ export default function HomePage() {
             </Button>
           </div>
         </Card>
+
+        <Card className="p-6 hover:shadow-lg transition-shadow">
+          <div className="flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
+              <svg
+                className="w-8 h-8 text-green-600 dark:text-green-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold mb-2 text-zinc-900 dark:text-zinc-50">
+              {t("home.searchCreditRequests")}
+            </h3>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+              {t("home.searchDescription")}
+            </p>
+            <Button 
+              className="w-full"
+              onClick={handleSearchCreditRequests}
+            >
+              {t("home.searchCreditRequests")}
+            </Button>
+          </div>
+        </Card>
       </div>
 
       <CreateCreditRequestModal
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
+        isOpen={isCreateModalOpen}
+        onClose={handleCreateModalClose}
         onSuccess={handleSuccess}
+      />
+
+      <SearchCreditRequestsModal
+        isOpen={isSearchModalOpen}
+        onClose={handleSearchModalClose}
       />
 
       <Toast

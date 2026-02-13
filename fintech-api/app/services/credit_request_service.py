@@ -145,4 +145,41 @@ async def update_credit_request_status(
     if bank_information:
         update_data["bank_information"] = bank_information.model_dump()
     
-    return await credit_request_repository.update(request_id, update_data)
+    updated_request = await credit_request_repository.update(request_id, update_data)
+    
+    # TODO: Send email notification to user when status changes to approved or rejected
+    # if updated_request and new_status in [CreditRequestStatus.APPROVED, CreditRequestStatus.REJECTED]:
+    #     # Get user email from user_id
+    #     from app.repositories.user_repository import user_repository
+    #     user = await user_repository.get_by_id(str(updated_request.user_id))
+    #     if user:
+    #         await send_email(
+    #             to=user.email,
+    #             subject=f"Credit Request {new_status.value}",
+    #             body=f"Your credit request has been {new_status.value}."
+    #         )
+    
+    return updated_request
+
+async def search_credit_requests(
+    user_id: str,
+    countries: Optional[list[str]] = None,
+    identity_document: Optional[str] = None,
+    status: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 20
+) -> tuple[list[CreditRequestInDB], int]:
+    """
+    Search credit requests with filters and pagination
+    
+    Returns:
+        tuple: (list of requests, total count)
+    """
+    return await credit_request_repository.search(
+        user_id=user_id,
+        countries=countries,
+        identity_document=identity_document,
+        status=status,
+        skip=skip,
+        limit=limit
+    )

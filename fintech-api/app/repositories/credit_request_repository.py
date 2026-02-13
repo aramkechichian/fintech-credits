@@ -42,6 +42,53 @@ class CreditRequestRepository:
             requests.append(CreditRequestInDB(**doc))
         return requests
 
+    async def search(
+        self,
+        user_id: Optional[str] = None,
+        countries: Optional[List[str]] = None,
+        identity_document: Optional[str] = None,
+        status: Optional[str] = None,
+        skip: int = 0,
+        limit: int = 20
+    ) -> tuple[List[CreditRequestInDB], int]:
+        """
+        Search credit requests with filters and pagination
+        
+        Returns:
+            tuple: (list of requests, total count)
+        """
+        db = get_database()
+        
+        # Build query
+        query = {}
+        
+        # Filter by user_id (users can only see their own requests)
+        if user_id:
+            query["user_id"] = ObjectId(user_id)
+        
+        # Filter by countries
+        if countries and len(countries) > 0:
+            query["country"] = {"$in": countries}
+        
+        # Filter by identity document (partial match, case insensitive)
+        if identity_document:
+            query["identity_document"] = {"$regex": identity_document, "$options": "i"}
+        
+        # Filter by status
+        if status:
+            query["status"] = status
+        
+        # Get total count
+        total_count = await db[self.collection_name].count_documents(query)
+        
+        # Get paginated results
+        cursor = db[self.collection_name].find(query).skip(skip).limit(limit).sort("created_at", -1)
+        requests = []
+        async for doc in cursor:
+            requests.append(CreditRequestInDB(**doc))
+        
+        return requests, total_count
+
     async def update(self, request_id: str, update_data: dict) -> Optional[CreditRequestInDB]:
         """Update a credit request"""
         db = get_database()

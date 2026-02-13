@@ -34,7 +34,9 @@
     "title": "Panel Principal",
     "createCreditRequest": "Crear Solicitud de Crédito",
     "description": "Gestiona tus solicitudes de crédito y sigue su estado",
-    "startNewRequest": "Inicia una nueva solicitud de crédito"
+    "startNewRequest": "Inicia una nueva solicitud de crédito",
+    "searchCreditRequests": "Consultar Solicitudes",
+    "searchDescription": "Busca y filtra tus solicitudes de crédito"
   },
   "header": {
     "logout": "Cerrar Sesión",
@@ -43,6 +45,12 @@
   "common": {
     "loading": "Cargando..."
   },
+  "errors": {
+    "mustBeLoggedIn": "Debes iniciar sesión",
+    "sessionExpired": "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
+    "userNotFound": "Usuario no encontrado",
+    "getUserFailed": "Error al obtener información del usuario"
+  },
   "creditRequest": {
     "createTitle": "Crear Solicitud de Crédito",
     "country": "País",
@@ -50,7 +58,7 @@
     "fullName": "Nombre Completo",
     "fullNamePlaceholder": "Ingresa tu nombre completo",
     "identityDocument": "Documento de Identidad",
-    "identityDocumentPlaceholder": "Ingresa tu documento de identidad",
+    "identityDocumentPlaceholder": "Ingresa documento de identidad",
     "requestedAmount": "Monto Solicitado",
     "requestedAmountPlaceholder": "Ingresa el monto que deseas solicitar",
     "monthlyIncome": "Ingreso Mensual",
@@ -58,13 +66,54 @@
     "submit": "Crear Solicitud",
     "cancel": "Cancelar",
     "successMessage": "¡Solicitud de crédito creada exitosamente!",
+    "searchTitle": "Buscar Solicitudes de Crédito",
+    "filterByCountry": "Filtrar por País",
+    "filterByIdentityDocument": "Filtrar por documento de identidad",
+    "filterByStatus": "Filtrar por Estado",
+    "allStatuses": "Todos los Estados",
+    "resetFilters": "Limpiar",
+    "search": "Buscar",
+    "listTitle": "Solicitudes de Crédito",
+    "backToHome": "Volver al Inicio",
+    "noResults": "No se encontraron resultados",
+    "noResultsDescription": "No hay solicitudes que coincidan con los filtros seleccionados.",
+    "searchError": "Error al buscar solicitudes",
+    "status": {
+      "_label": "Estado",
+      "pending": "Pendiente",
+      "in_review": "En Revisión",
+      "approved": "Aprobada",
+      "rejected": "Rechazada",
+      "cancelled": "Cancelada"
+    },
+    "requestDate": "Fecha de Solicitud",
+    "showingResults": "Mostrando {{from}} a {{to}} de {{total}} resultados",
+    "pageOf": "Página {{page}} de {{total}}",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "detailTitle": "Detalle de Solicitud de Crédito",
+    "viewDetail": "Ver Detalle",
+    "actions": "Acciones",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "bankInformation": "Información Bancaria",
+    "bankName": "Banco",
+    "accountNumber": "Número de Cuenta",
+    "statusUpdate": {
+      "approved": "Solicitud aprobada exitosamente",
+      "rejected": "Solicitud rechazada"
+    },
     "errors": {
       "countryRequired": "Debes seleccionar un país",
       "fullNameRequired": "El nombre completo es requerido",
       "identityDocumentRequired": "El documento de identidad es requerido",
       "amountRequired": "El monto solicitado debe ser mayor a 0",
       "incomeRequired": "El ingreso mensual debe ser mayor a 0",
-      "createFailed": "Error al crear la solicitud de crédito"
+      "createFailed": "Error al crear la solicitud de crédito",
+      "getAllFailed": "Error al obtener las solicitudes de crédito",
+      "getByIdFailed": "Error al obtener la solicitud de crédito",
+      "searchFailed": "Error al buscar solicitudes de crédito",
+      "updateFailed": "Error al actualizar la solicitud de crédito"
     }
   }
 }

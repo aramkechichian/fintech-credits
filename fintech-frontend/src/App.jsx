@@ -4,12 +4,20 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
+import CreditRequestsListPage from "./pages/CreditRequestsListPage";
 import Header from "./components/Header";
 
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
   const { t } = useTranslation();
-  const [route, setRoute] = useState(isAuthenticated ? "home" : "login");
+  const [route, setRoute] = useState(() => {
+    if (typeof window !== "undefined") {
+      const path = window.location.pathname;
+      if (path.startsWith("/credit-requests/search")) return "search";
+      if (path === "/" || path === "/home") return "home";
+    }
+    return isAuthenticated ? "home" : "login";
+  });
 
   const handleNavigate = (nextRoute) => {
     setRoute(nextRoute);
@@ -24,12 +32,31 @@ function AppContent() {
     }
   }, [isAuthenticated, route]);
 
+  // Handle browser navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (path.startsWith("/credit-requests/search")) {
+        setRoute("search");
+      } else if (path === "/" || path === "/home") {
+        setRoute("home");
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
   const Page = useMemo(() => {
     if (!isAuthenticated) {
       if (route === "register") {
         return <RegisterPage onNavigate={handleNavigate} />;
       }
       return <LoginPage onNavigate={handleNavigate} />;
+    }
+
+    if (route === "search" || window.location.pathname.startsWith("/credit-requests/search")) {
+      return <CreditRequestsListPage />;
     }
 
     if (route === "home") return <HomePage />;
