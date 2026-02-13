@@ -12,6 +12,22 @@ class Country(str, Enum):
     ITALY = "Italy"
     COLOMBIA = "Colombia"
 
+class CurrencyCode(str, Enum):
+    BRL = "BRL"  # Brazil - Real brasileño
+    MXN = "MXN"  # Mexico - Peso mexicano
+    EUR = "EUR"  # Portugal, Spain, Italy - Euro
+    COP = "COP"  # Colombia - Peso colombiano
+
+# Mapping country to currency
+COUNTRY_CURRENCY_MAP = {
+    Country.BRAZIL: CurrencyCode.BRL,
+    Country.MEXICO: CurrencyCode.MXN,
+    Country.PORTUGAL: CurrencyCode.EUR,
+    Country.SPAIN: CurrencyCode.EUR,
+    Country.ITALY: CurrencyCode.EUR,
+    Country.COLOMBIA: CurrencyCode.COP,
+}
+
 class CreditRequestStatus(str, Enum):
     PENDING = "pending"
     IN_REVIEW = "in_review"
@@ -50,6 +66,7 @@ class CreditRequestInDB(CreditRequestBase):
     
     id: Optional[ObjectId] = Field(default=None, alias="_id")
     user_id: ObjectId  # Reference to user who created the request
+    currency_code: CurrencyCode  # Currency code based on country
     request_date: datetime = Field(default_factory=datetime.utcnow)
     status: CreditRequestStatus = CreditRequestStatus.PENDING
     bank_information: Optional[BankInformation] = None
@@ -60,6 +77,7 @@ class CreditRequestResponse(CreditRequestBase):
     """Credit request response schema"""
     id: str
     user_id: str
+    currency_code: CurrencyCode
     request_date: datetime
     status: CreditRequestStatus
     bank_information: Optional[BankInformation] = None

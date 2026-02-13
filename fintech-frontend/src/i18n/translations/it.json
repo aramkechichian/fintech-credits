@@ -42,5 +42,29 @@
   },
   "common": {
     "loading": "Caricamento..."
+  },
+  "creditRequest": {
+    "createTitle": "Crea Richiesta di Credito",
+    "country": "Paese",
+    "selectCountry": "Seleziona un paese",
+    "fullName": "Nome Completo",
+    "fullNamePlaceholder": "Inserisci il tuo nome completo",
+    "identityDocument": "Documento di Identità",
+    "identityDocumentPlaceholder": "Inserisci il tuo documento di identità",
+    "requestedAmount": "Importo Richiesto",
+    "requestedAmountPlaceholder": "Inserisci l'importo che desideri richiedere",
+    "monthlyIncome": "Reddito Mensile",
+    "monthlyIncomePlaceholder": "Inserisci il tuo reddito mensile",
+    "submit": "Crea Richiesta",
+    "cancel": "Annulla",
+    "successMessage": "Richiesta di credito creata con successo!",
+    "errors": {
+      "countryRequired": "Devi selezionare un paese",
+      "fullNameRequired": "Il nome completo è obbligatorio",
+      "identityDocumentRequired": "Il documento di identità è obbligatorio",
+      "amountRequired": "L'importo richiesto deve essere maggiore di 0",
+      "incomeRequired": "Il reddito mensile deve essere maggiore di 0",
+      "createFailed": "Errore nella creazione della richiesta di credito"
+    }
   }
 }

@@ -6,9 +6,13 @@ from app.models.credit_request import (
     CreditRequestCreate,
     CreditRequestInDB,
     CreditRequestStatus,
-    BankInformation
+    BankInformation,
+    CurrencyCode,
+    Country,
+    COUNTRY_CURRENCY_MAP
 )
 from app.repositories.credit_request_repository import credit_request_repository
+from app.services.log_service import log_request
 
 logger = logging.getLogger(__name__)
 
@@ -34,10 +38,28 @@ async def create_credit_request(
     """
     logger.info(f"Creating credit request for user {user_id}")
     
+    # Get currency code based on country
+    # The country comes as a string from the API, so we need to convert it to the enum
+    country_enum = credit_request_data.country
+    if isinstance(country_enum, str):
+        # Convert string to Country enum
+        try:
+            country_enum = Country(country_enum)
+        except ValueError:
+            logger.error(f"Invalid country value: {country_enum}")
+            raise ValueError(f"Invalid country: {country_enum}")
+    
+    # Get currency code from map
+    currency_code = COUNTRY_CURRENCY_MAP.get(country_enum)
+    if not currency_code:
+        logger.warning(f"Country {country_enum} not found in currency map, using EUR as fallback")
+        currency_code = CurrencyCode.EUR
+    
     # Create credit request object
     credit_request = CreditRequestInDB(
         user_id=ObjectId(user_id),
         country=credit_request_data.country,
+        currency_code=currency_code,
         full_name=credit_request_data.full_name,
         identity_document=credit_request_data.identity_document,
         requested_amount=credit_request_data.requested_amount,
@@ -53,6 +75,26 @@ async def create_credit_request(
     created_request = await credit_request_repository.create(credit_request)
     
     logger.info(f"Credit request {created_request.id} created successfully")
+    
+    # Log the request creation (this is called from service, controller will also log the full request/response)
+    try:
+        await log_request(
+            endpoint="/credit-requests",
+            method="POST",
+            user_id=user_id,
+            payload={
+                "country": credit_request_data.country.value if hasattr(credit_request_data.country, 'value') else str(credit_request_data.country),
+                "full_name": credit_request_data.full_name,
+                "identity_document": credit_request_data.identity_document,
+                "requested_amount": credit_request_data.requested_amount,
+                "monthly_income": credit_request_data.monthly_income,
+                "currency_code": currency_code.value
+            },
+            response_status=201,
+            is_success=True
+        )
+    except Exception as e:
+        logger.error(f"Error logging credit request creation: {str(e)}", exc_info=True)
     
     # TODO: Additional logic to be implemented:
     # 

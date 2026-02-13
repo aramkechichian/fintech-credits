@@ -1,15 +1,33 @@
+import { useState } from "react";
 import { useTranslation } from "../i18n/I18nContext";
 import { useAuth } from "../context/AuthContext";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
+import CreateCreditRequestModal from "../components/CreateCreditRequestModal";
+import Toast from "../components/ui/Toast";
 
 export default function HomePage() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [toast, setToast] = useState({ isVisible: false, message: "", type: "success" });
 
   const handleCreateCreditRequest = () => {
-    // TODO: Implementar navegación a la página de crear solicitud de crédito
-    console.log("Crear solicitud de crédito");
+    console.log("Opening modal...");
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleSuccess = () => {
+    setIsModalOpen(false);
+    setToast({
+      isVisible: true,
+      message: t("creditRequest.successMessage"),
+      type: "success",
+    });
   };
 
   return (
@@ -24,7 +42,7 @@ export default function HomePage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={handleCreateCreditRequest}>
+        <Card className="p-6 hover:shadow-lg transition-shadow">
           <div className="flex flex-col items-center text-center">
             <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
               <svg
@@ -47,12 +65,28 @@ export default function HomePage() {
             <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
               {t("home.startNewRequest")}
             </p>
-            <Button className="w-full">
+            <Button 
+              className="w-full"
+              onClick={handleCreateCreditRequest}
+            >
               {t("home.createCreditRequest")}
             </Button>
           </div>
         </Card>
       </div>
+
+      <CreateCreditRequestModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onSuccess={handleSuccess}
+      />
+
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={() => setToast({ ...toast, isVisible: false })}
+      />
     </div>
   );
 }

@@ -51,6 +51,9 @@ yarn-error.log*
 .env.local
 .env.*.local
 
+# Project context (local development notes)
+context.md
+
 # Logs
 *.log
 logs/

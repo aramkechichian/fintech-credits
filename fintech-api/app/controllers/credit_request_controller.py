@@ -14,6 +14,7 @@ from app.services.credit_request_service import (
     get_user_credit_requests,
     update_credit_request_status
 )
+from app.services.log_service import log_request
 from app.controllers.auth_controller import get_current_user_dependency
 
 logger = logging.getLogger(__name__)
@@ -44,10 +45,11 @@ async def create_request(
             bank_information=bank_information
         )
         
-        return CreditRequestResponse(
+        response = CreditRequestResponse(
             id=str(credit_request.id),
             user_id=str(credit_request.user_id),
             country=credit_request.country,
+            currency_code=credit_request.currency_code,
             full_name=credit_request.full_name,
             identity_document=credit_request.identity_document,
             requested_amount=credit_request.requested_amount,
@@ -58,14 +60,46 @@ async def create_request(
             created_at=credit_request.created_at,
             updated_at=credit_request.updated_at
         )
+        
+        # Log successful request (already logged in service, but log response too)
+        await log_request(
+            endpoint="/credit-requests",
+            method="POST",
+            user_id=str(current_user.id),
+            payload=credit_request_data.model_dump(),
+            response_status=201,
+            is_success=True
+        )
+        
+        return response
     except ValueError as e:
         logger.warning(f"Validation error creating credit request: {str(e)}")
+        # Log error
+        await log_request(
+            endpoint="/credit-requests",
+            method="POST",
+            user_id=str(current_user.id),
+            payload=credit_request_data.model_dump() if credit_request_data else None,
+            response_status=400,
+            is_success=False,
+            error_message=str(e)
+        )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
     except Exception as e:
         logger.error(f"Error creating credit request: {str(e)}", exc_info=True)
+        # Log error
+        await log_request(
+            endpoint="/credit-requests",
+            method="POST",
+            user_id=str(current_user.id),
+            payload=credit_request_data.model_dump() if credit_request_data else None,
+            response_status=500,
+            is_success=False,
+            error_message=str(e)
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error creating credit request"
@@ -83,6 +117,7 @@ async def get_my_requests(
                 id=str(req.id),
                 user_id=str(req.user_id),
                 country=req.country,
+                currency_code=req.currency_code,
                 full_name=req.full_name,
                 identity_document=req.identity_document,
                 requested_amount=req.requested_amount,
@@ -128,6 +163,7 @@ async def get_request(
             id=str(credit_request.id),
             user_id=str(credit_request.user_id),
             country=credit_request.country,
+            currency_code=credit_request.currency_code,
             full_name=credit_request.full_name,
             identity_document=credit_request.identity_document,
             requested_amount=credit_request.requested_amount,
