@@ -1,0 +1,46 @@
+{
+  "login": {
+    "title": "Login",
+    "subtitle": "Sign in to your account",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "submit": "Sign In",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Register here",
+    "error": "Invalid email or password"
+  },
+  "register": {
+    "title": "Create Account",
+    "subtitle": "Sign up to get started",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Enter your full name",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password (minimum 6 characters)",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "submit": "Sign Up",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Sign in here",
+    "error": "Error registering user",
+    "passwordMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 6 characters"
+  },
+  "home": {
+    "welcome": "Welcome",
+    "title": "Main Dashboard",
+    "createCreditRequest": "Create Credit Request",
+    "description": "Manage your credit requests and track their status",
+    "startNewRequest": "Start a new credit request"
+  },
+  "header": {
+    "logout": "Logout",
+    "language": "Language"
+  },
+  "common": {
+    "loading": "Loading..."
+  }
+}

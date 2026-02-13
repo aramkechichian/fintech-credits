@@ -1,0 +1,46 @@
+{
+  "login": {
+    "title": "Entrar",
+    "subtitle": "Entre na sua conta",
+    "email": "E-mail",
+    "emailPlaceholder": "Digite seu e-mail",
+    "password": "Senha",
+    "passwordPlaceholder": "Digite sua senha",
+    "submit": "Entrar",
+    "noAccount": "Não tem uma conta?",
+    "registerLink": "Registre-se aqui",
+    "error": "E-mail ou senha inválidos"
+  },
+  "register": {
+    "title": "Criar Conta",
+    "subtitle": "Registre-se para começar",
+    "fullName": "Nome completo",
+    "fullNamePlaceholder": "Digite seu nome completo",
+    "email": "E-mail",
+    "emailPlaceholder": "Digite seu e-mail",
+    "password": "Senha",
+    "passwordPlaceholder": "Digite sua senha (mínimo 6 caracteres)",
+    "confirmPassword": "Confirmar senha",
+    "confirmPasswordPlaceholder": "Confirme sua senha",
+    "submit": "Registrar",
+    "hasAccount": "Já tem uma conta?",
+    "loginLink": "Entre aqui",
+    "error": "Erro ao registrar usuário",
+    "passwordMismatch": "As senhas não coincidem",
+    "passwordTooShort": "A senha deve ter pelo menos 6 caracteres"
+  },
+  "home": {
+    "welcome": "Bem-vindo",
+    "title": "Painel Principal",
+    "createCreditRequest": "Criar Solicitação de Crédito",
+    "description": "Gerencie suas solicitações de crédito e acompanhe seu status",
+    "startNewRequest": "Inicie uma nova solicitação de crédito"
+  },
+  "header": {
+    "logout": "Sair",
+    "language": "Idioma"
+  },
+  "common": {
+    "loading": "Carregando..."
+  }
+}

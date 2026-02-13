@@ -1,0 +1,46 @@
+{
+  "login": {
+    "title": "Accedi",
+    "subtitle": "Accedi al tuo account",
+    "email": "Email",
+    "emailPlaceholder": "Inserisci la tua email",
+    "password": "Password",
+    "passwordPlaceholder": "Inserisci la tua password",
+    "submit": "Accedi",
+    "noAccount": "Non hai un account?",
+    "registerLink": "Registrati qui",
+    "error": "Email o password non validi"
+  },
+  "register": {
+    "title": "Crea Account",
+    "subtitle": "Registrati per iniziare",
+    "fullName": "Nome completo",
+    "fullNamePlaceholder": "Inserisci il tuo nome completo",
+    "email": "Email",
+    "emailPlaceholder": "Inserisci la tua email",
+    "password": "Password",
+    "passwordPlaceholder": "Inserisci la tua password (minimo 6 caratteri)",
+    "confirmPassword": "Conferma password",
+    "confirmPasswordPlaceholder": "Conferma la tua password",
+    "submit": "Registrati",
+    "hasAccount": "Hai già un account?",
+    "loginLink": "Accedi qui",
+    "error": "Errore durante la registrazione",
+    "passwordMismatch": "Le password non corrispondono",
+    "passwordTooShort": "La password deve avere almeno 6 caratteri"
+  },
+  "home": {
+    "welcome": "Benvenuto",
+    "title": "Dashboard Principale",
+    "createCreditRequest": "Crea Richiesta di Credito",
+    "description": "Gestisci le tue richieste di credito e monitora il loro stato",
+    "startNewRequest": "Inizia una nuova richiesta di credito"
+  },
+  "header": {
+    "logout": "Esci",
+    "language": "Lingua"
+  },
+  "common": {
+    "loading": "Caricamento..."
+  }
+}

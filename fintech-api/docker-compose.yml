@@ -1,0 +1,28 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: fintech-api-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_DATABASE=fintech-db
+
+  api:
+    build: .
+    container_name: fintech-api
+    env_file: .env
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017
+    # If running outside docker network, use:
+    # - MONGODB_URL=mongodb://host.docker.internal:27017
+
+volumes:
+  mongodb_data:
