@@ -115,5 +115,47 @@
       "searchFailed": "Error searching credit requests",
       "updateFailed": "Error updating credit request"
     }
+  },
+  "sidebar": {
+    "home": "Home",
+    "manageCountryRules": "Manage Country Rules"
+  },
+  "countryRules": {
+    "title": "Country Rules Management",
+    "description": "Manage validation rules for each country",
+    "country": "Country",
+    "requiredDocument": "Required Document",
+    "description": "Description",
+    "isActive": "Active",
+    "validationRules": "Validation Rules",
+    "maxPercentage": "Maximum Percentage",
+    "maxPercentageHelp": "Maximum percentage of monthly income that can be requested (e.g., 30 = 30%)",
+    "enabled": "Enabled",
+    "errorMessage": "Error Message",
+    "errorMessagePlaceholder": "Custom message when the rule fails",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create Rule",
+    "editRule": "Edit Rule",
+    "createRule": "Create New Rule",
+    "noRules": "No rules configured",
+    "loading": "Loading rules...",
+    "error": "Error loading rules",
+    "save": "Save",
+    "cancel": "Cancel",
+    "addRule": "Add Rule",
+    "deleteConfirm": "Are you sure you want to delete this rule?",
+    "success": {
+      "created": "Rule created successfully",
+      "updated": "Rule updated successfully",
+      "deleted": "Rule deleted successfully"
+    },
+    "errors": {
+      "createFailed": "Error creating rule",
+      "updateFailed": "Error updating rule",
+      "deleteFailed": "Error deleting rule",
+      "loadFailed": "Error loading rules"
+    }
   }
 }

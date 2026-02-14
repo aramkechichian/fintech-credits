@@ -115,5 +115,43 @@
       "searchFailed": "Error al buscar solicitudes de crédito",
       "updateFailed": "Error al actualizar la solicitud de crédito"
     }
+  },
+  "sidebar": {
+    "home": "Inicio",
+    "manageCountryRules": "Gestionar Reglas de Países"
+  },
+  "countryRules": {
+    "title": "Gestión de Reglas de Países",
+    "description": "Administra las reglas de validación para cada país",
+    "country": "País",
+    "requiredDocument": "Documento Requerido",
+    "description": "Descripción",
+    "isActive": "Activo",
+    "validationRules": "Reglas de Validación",
+    "maxPercentage": "Porcentaje Máximo",
+    "maxPercentageHelp": "Porcentaje máximo del ingreso mensual que se puede solicitar (ej: 30 = 30%)",
+    "enabled": "Habilitada",
+    "errorMessage": "Mensaje de Error",
+    "errorMessagePlaceholder": "Mensaje personalizado cuando la regla falla",
+    "actions": "Acciones",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "editRule": "Editar Regla",
+    "noRules": "No hay reglas configuradas",
+    "loading": "Cargando reglas...",
+    "error": "Error al cargar las reglas",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "addRule": "Agregar Regla",
+    "deleteConfirm": "¿Estás seguro de que deseas eliminar esta regla?",
+    "success": {
+      "updated": "Regla actualizada exitosamente",
+      "deleted": "Regla eliminada exitosamente"
+    },
+    "errors": {
+      "updateFailed": "Error al actualizar la regla",
+      "deleteFailed": "Error al eliminar la regla",
+      "loadFailed": "Error al cargar las reglas"
+    }
   }
 }

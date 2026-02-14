@@ -7,6 +7,7 @@ from app.core.database import connect_to_mongo, close_mongo_connection
 from app.controllers.test_controller import router as test_router
 from app.controllers.auth_controller import router as auth_router
 from app.controllers.credit_request_controller import router as credit_request_router
+from app.controllers.country_rule_controller import router as country_rule_router
 import logging
 import time
 
@@ -20,6 +21,12 @@ logger.info("Starting fintech-api application...")
 async def lifespan(app: FastAPI):
     # Startup
     await connect_to_mongo()
+    # Initialize default country rules
+    from app.core.init_country_rules import initialize_default_country_rules
+    try:
+        await initialize_default_country_rules()
+    except Exception as e:
+        logger.error(f"Error initializing country rules: {str(e)}", exc_info=True)
     yield
     # Shutdown
     await close_mongo_connection()
@@ -119,6 +126,7 @@ async def log_requests(request: Request, call_next):
 app.include_router(test_router)
 app.include_router(auth_router)
 app.include_router(credit_request_router)
+app.include_router(country_rule_router)
 
 @app.get("/health")
 def health():

@@ -5,7 +5,9 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
 import CreditRequestsListPage from "./pages/CreditRequestsListPage";
+import CountryRulesPage from "./pages/CountryRulesPage";
 import Header from "./components/Header";
+import Sidebar from "./components/Sidebar";
 
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -59,6 +61,10 @@ function AppContent() {
       return <CreditRequestsListPage />;
     }
 
+    if (route === "country-rules") {
+      return <CountryRulesPage />;
+    }
+
     if (route === "home") return <HomePage />;
     
     return <HomePage />;
@@ -86,9 +92,12 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-zinc-100 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
       <Header />
-      <main className="mx-auto w-full max-w-6xl px-6 py-6">
-        {Page}
-      </main>
+      <div className="flex">
+        <Sidebar currentRoute={route} onNavigate={handleNavigate} />
+        <main className="flex-1 ml-64 px-8 py-8 max-w-full">
+          {Page}
+        </main>
+      </div>
     </div>
   );
 }

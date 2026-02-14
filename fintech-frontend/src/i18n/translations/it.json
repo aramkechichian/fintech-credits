@@ -115,5 +115,47 @@
       "searchFailed": "Errore nella ricerca delle richieste di credito",
       "updateFailed": "Errore nell'aggiornamento della richiesta di credito"
     }
+  },
+  "sidebar": {
+    "home": "Home",
+    "manageCountryRules": "Gestisci Regole Paesi"
+  },
+  "countryRules": {
+    "title": "Gestione Regole Paesi",
+    "description": "Gestisci le regole di validazione per ogni paese",
+    "country": "Paese",
+    "requiredDocument": "Documento Richiesto",
+    "description": "Descrizione",
+    "isActive": "Attivo",
+    "validationRules": "Regole di Validazione",
+    "maxPercentage": "Percentuale Massima",
+    "maxPercentageHelp": "Percentuale massima del reddito mensile che può essere richiesta (es: 30 = 30%)",
+    "enabled": "Abilitata",
+    "errorMessage": "Messaggio di Errore",
+    "errorMessagePlaceholder": "Messaggio personalizzato quando la regola fallisce",
+    "actions": "Azioni",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "create": "Crea Regola",
+    "editRule": "Modifica Regola",
+    "createRule": "Crea Nuova Regola",
+    "noRules": "Nessuna regola configurata",
+    "loading": "Caricamento regole...",
+    "error": "Errore nel caricamento delle regole",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "addRule": "Aggiungi Regola",
+    "deleteConfirm": "Sei sicuro di voler eliminare questa regola?",
+    "success": {
+      "created": "Regola creata con successo",
+      "updated": "Regola aggiornata con successo",
+      "deleted": "Regola eliminata con successo"
+    },
+    "errors": {
+      "createFailed": "Errore nella creazione della regola",
+      "updateFailed": "Errore nell'aggiornamento della regola",
+      "deleteFailed": "Errore nell'eliminazione della regola",
+      "loadFailed": "Errore nel caricamento delle regole"
+    }
   }
 }
