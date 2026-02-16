@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "../i18n/I18nContext";
 import { creditRequestApi } from "../api/creditRequestApi";
+import { bankProviderApi } from "../api/bankProviderApi";
 import { translateError } from "../utils/errorTranslator";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import Spinner from "../components/ui/Spinner";
 import CreditRequestDetailModal from "../components/CreditRequestDetailModal";
+import Modal from "../components/ui/Modal";
 
 // Status labels will be translated using the translation function
 
@@ -30,6 +32,11 @@ export default function CreditRequestsListPage() {
   });
   const [selectedRequestId, setSelectedRequestId] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isBankInfoModalOpen, setIsBankInfoModalOpen] = useState(false);
+  const [bankInfoData, setBankInfoData] = useState(null);
+  const [bankInfoLoading, setBankInfoLoading] = useState(false);
+  const [bankInfoError, setBankInfoError] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState(null);
 
   // Get filters from URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -228,16 +235,60 @@ export default function CreditRequestsListPage() {
                         {formatDate(request.request_date)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedRequestId(request.id);
-                            setIsDetailModalOpen(true);
-                          }}
-                          className="text-xs px-3 py-1"
-                        >
-                          {t("creditRequest.viewDetail")}
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedRequestId(request.id);
+                              setIsDetailModalOpen(true);
+                            }}
+                            className="text-xs px-3 py-1"
+                          >
+                            {t("creditRequest.viewDetail")}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={async () => {
+                              setBankInfoData(null);
+                              setBankInfoError("");
+                              setSelectedCountry(request.country);
+                              setIsBankInfoModalOpen(true);
+                              setBankInfoLoading(true);
+                              
+                              try {
+                                const data = await bankProviderApi.getBankInformation(
+                                  request.country,
+                                  request.full_name,
+                                  request.identity_document
+                                );
+                                setBankInfoData(data);
+                                setBankInfoError("");
+                              } catch (err) {
+                                // If it's a 404 or connection error, show a friendly message
+                                if (err.message.includes("404") || err.message.includes("Not Found") || err.message.includes("Failed to fetch")) {
+                                  setBankInfoData({
+                                    status: "not_connected",
+                                    message: t("creditRequest.bankInfo.notConnectedMessage", { country: request.country }),
+                                    description: t("creditRequest.bankInfo.description"),
+                                    country: request.country,
+                                    full_name: request.full_name,
+                                    identity_document: request.identity_document,
+                                    bank_information: null
+                                  });
+                                  setBankInfoError("");
+                                } else {
+                                  const errorMessage = translateError(err.message, t);
+                                  setBankInfoError(errorMessage || t("creditRequest.bankInfo.error"));
+                                }
+                              } finally {
+                                setBankInfoLoading(false);
+                              }
+                            }}
+                            className="text-xs px-3 py-1"
+                          >
+                            {t("creditRequest.consultBankSituation")}
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -302,6 +353,96 @@ export default function CreditRequestsListPage() {
           );
         }}
       />
+
+      {/* Bank Information Modal */}
+      <Modal
+        isOpen={isBankInfoModalOpen}
+        onClose={() => {
+          setIsBankInfoModalOpen(false);
+          setBankInfoData(null);
+          setBankInfoError("");
+          setSelectedCountry(null);
+        }}
+        title={t("creditRequest.bankInfo.title")}
+        size="md"
+      >
+        {bankInfoLoading ? (
+          <div className="flex justify-center items-center py-8">
+            <Spinner />
+          </div>
+        ) : bankInfoError ? (
+          <div className="p-4 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">
+            {bankInfoError}
+          </div>
+        ) : bankInfoData ? (
+          <div className="space-y-4">
+            {bankInfoData.status === "not_connected" ? (
+              <div className="space-y-3">
+                <div className="p-4 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400">
+                  <p className="font-medium mb-2">{t("creditRequest.bankInfo.notConnected")}</p>
+                  <p className="text-sm mb-3">
+                    {bankInfoData.message || t("creditRequest.bankInfo.notConnectedMessage", { country: bankInfoData.country || selectedCountry || "" })}
+                  </p>
+                  <div className="mt-3 pt-3 border-t border-yellow-300 dark:border-yellow-700">
+                    <p className="text-sm font-medium mb-1">{t("creditRequest.bankInfo.about")}</p>
+                    <p className="text-sm">
+                      {bankInfoData.description || t("creditRequest.bankInfo.description")}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="p-4 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                  <p className="font-medium">{t("creditRequest.bankInfo.connected")}</p>
+                </div>
+                {bankInfoData.bank_information && (
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-zinc-900 dark:text-zinc-50">
+                      {t("creditRequest.bankInfo.details")}
+                    </h4>
+                    <div className="bg-zinc-50 dark:bg-zinc-800 p-4 rounded-lg space-y-2 text-sm">
+                      {bankInfoData.bank_information.bank_name && (
+                        <div>
+                          <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                            {t("creditRequest.bankName")}:
+                          </span>{" "}
+                          <span className="text-zinc-900 dark:text-zinc-50">
+                            {bankInfoData.bank_information.bank_name}
+                          </span>
+                        </div>
+                      )}
+                      {bankInfoData.bank_information.account_number && (
+                        <div>
+                          <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                            {t("creditRequest.accountNumber")}:
+                          </span>{" "}
+                          <span className="text-zinc-900 dark:text-zinc-50">
+                            {bankInfoData.bank_information.account_number}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="pt-4 border-t border-zinc-200 dark:border-zinc-700">
+              <div className="text-xs text-zinc-600 dark:text-zinc-400 space-y-1">
+                <div>
+                  <span className="font-medium">{t("creditRequest.country")}:</span> {bankInfoData.country}
+                </div>
+                <div>
+                  <span className="font-medium">{t("creditRequest.fullName")}:</span> {bankInfoData.full_name}
+                </div>
+                <div>
+                  <span className="font-medium">{t("creditRequest.identityDocument")}:</span> {bankInfoData.identity_document}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </Modal>
     </div>
   );
 }

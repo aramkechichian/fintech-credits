@@ -93,11 +93,23 @@
     "next": "Próximo",
     "detailTitle": "Detalhes da Solicitação de Crédito",
     "viewDetail": "Ver Detalhes",
+    "consultBankSituation": "Consultar Situação Bancária",
     "actions": "Ações",
     "approve": "Aprovar",
     "reject": "Rejeitar",
     "bankInformation": "Informações Bancárias",
     "bankName": "Banco",
+    "accountNumber": "Número da Conta",
+    "bankInfo": {
+      "title": "Informações Bancárias",
+      "notConnected": "API Externa Não Conectada",
+      "notConnectedMessage": "Nenhuma API externa está conectada para o país {{country}}.",
+      "connected": "Informação obtida com sucesso",
+      "details": "Detalhes Bancários",
+      "error": "Erro ao obter informações bancárias",
+      "about": "Sobre este challenge:",
+      "description": "Este challenge deixa preparada a possibilidade de conectar todas as APIs que forem necessárias. A arquitetura está pronta para integrar provedores bancários específicos por país quando necessário."
+    },
     "accountNumber": "Número da Conta",
     "statusUpdate": {
       "approved": "Solicitação aprovada com sucesso",

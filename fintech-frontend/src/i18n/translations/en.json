@@ -93,12 +93,23 @@
     "next": "Next",
     "detailTitle": "Credit Request Details",
     "viewDetail": "View Detail",
+    "consultBankSituation": "Consult Bank Situation",
     "actions": "Actions",
     "approve": "Approve",
     "reject": "Reject",
     "bankInformation": "Bank Information",
     "bankName": "Bank",
     "accountNumber": "Account Number",
+    "bankInfo": {
+      "title": "Bank Information",
+      "notConnected": "External API Not Connected",
+      "notConnectedMessage": "No external API is connected for the country {{country}}.",
+      "connected": "Information retrieved successfully",
+      "details": "Bank Details",
+      "error": "Error retrieving bank information",
+      "about": "About this challenge:",
+      "description": "This challenge leaves prepared the possibility to connect all required APIs. The architecture is ready to integrate country-specific bank providers when needed."
+    },
     "statusUpdate": {
       "approved": "Request approved successfully",
       "rejected": "Request rejected"
