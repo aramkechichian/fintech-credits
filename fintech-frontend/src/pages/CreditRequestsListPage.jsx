@@ -26,7 +26,7 @@ export default function CreditRequestsListPage() {
   const [error, setError] = useState("");
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 20,
+    limit: 5,
     total: 0,
     total_pages: 0,
   });
@@ -37,35 +37,69 @@ export default function CreditRequestsListPage() {
   const [bankInfoLoading, setBankInfoLoading] = useState(false);
   const [bankInfoError, setBankInfoError] = useState("");
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const [urlParams, setUrlParams] = useState(new URLSearchParams(window.location.search));
 
-  // Get filters from URL
-  const urlParams = new URLSearchParams(window.location.search);
+  // Update URL params when location changes
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setUrlParams(new URLSearchParams(window.location.search));
+    };
+
+    window.addEventListener('locationchange', handleLocationChange);
+    window.addEventListener('popstate', handleLocationChange);
+
+    return () => {
+      window.removeEventListener('locationchange', handleLocationChange);
+      window.removeEventListener('popstate', handleLocationChange);
+    };
+  }, []);
+
+  // Get filters from URL (now reactive)
   const countries = urlParams.getAll("countries");
   const identityDocument = urlParams.get("identity_document") || "";
   const status = urlParams.get("status") || "";
   const page = parseInt(urlParams.get("page") || "1", 10);
+  const limitFromUrl = parseInt(urlParams.get("limit") || "5", 10);
+
+  // Update pagination when URL params change
+  useEffect(() => {
+    setPagination(prev => ({
+      ...prev,
+      limit: limitFromUrl,
+      page: page
+    }));
+  }, [limitFromUrl, page]);
 
   useEffect(() => {
     loadRequests();
-  }, [page, countries.join(","), identityDocument, status]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlParams]);
 
   const loadRequests = async () => {
     setLoading(true);
     setError("");
 
     try {
+      // Always read from current URL to ensure we have the latest values
+      const currentParams = new URLSearchParams(window.location.search);
+      const currentPage = parseInt(currentParams.get("page") || "1", 10);
+      const currentLimit = parseInt(currentParams.get("limit") || "5", 10);
+      const currentCountries = currentParams.getAll("countries");
+      const currentIdentityDocument = currentParams.get("identity_document") || "";
+      const currentStatus = currentParams.get("status") || "";
+
       const params = new URLSearchParams();
-      countries.forEach((country) => params.append("countries", country));
-      if (identityDocument) params.append("identity_document", identityDocument);
-      if (status) params.append("status", status);
-      params.append("page", page.toString());
-      params.append("limit", pagination.limit.toString());
+      currentCountries.forEach((country) => params.append("countries", country));
+      if (currentIdentityDocument) params.append("identity_document", currentIdentityDocument);
+      if (currentStatus) params.append("status", currentStatus);
+      params.append("page", currentPage.toString());
+      params.append("limit", currentLimit.toString());
 
       const data = await creditRequestApi.search(params);
       setRequests(data.items || []);
       setPagination({
         page: data.page || 1,
-        limit: data.limit || 20,
+        limit: data.limit || 5,
         total: data.total || 0,
         total_pages: data.total_pages || 0,
       });
@@ -86,7 +120,18 @@ export default function CreditRequestsListPage() {
   const handlePageChange = (newPage) => {
     const params = new URLSearchParams(window.location.search);
     params.set("page", newPage.toString());
-    window.location.href = `/credit-requests/search?${params.toString()}`;
+    params.set("limit", pagination.limit.toString());
+    window.history.pushState({ path: window.location.pathname }, "", `${window.location.pathname}?${params.toString()}`);
+    window.dispatchEvent(new Event('locationchange'));
+  };
+
+  const handleLimitChange = (newLimit) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("limit", newLimit.toString());
+    params.set("page", "1"); // Reset to first page when changing limit
+    window.history.pushState({ path: window.location.pathname }, "", `${window.location.pathname}?${params.toString()}`);
+    window.dispatchEvent(new Event('locationchange'));
+    setPagination(prev => ({ ...prev, limit: newLimit, page: 1 }));
   };
 
   const formatCurrency = (amount, currencyCode) => {
@@ -298,40 +343,58 @@ export default function CreditRequestsListPage() {
           </Card>
 
           {/* Pagination */}
-          {pagination.total_pages > 1 && (
-            <div className="mt-6 flex items-center justify-between">
-              <div className="text-sm text-zinc-600 dark:text-zinc-400">
-                {t("creditRequest.showingResults", {
-                  from: (pagination.page - 1) * pagination.limit + 1,
-                  to: Math.min(
-                    pagination.page * pagination.limit,
-                    pagination.total
-                  ),
-                  total: pagination.total,
-                })}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => handlePageChange(pagination.page - 1)}
-                  disabled={pagination.page === 1}
-                >
-                  {t("creditRequest.previous")}
-                </Button>
-                <span className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400">
-                  {t("creditRequest.pageOf", {
-                    page: pagination.page,
-                    total: pagination.total_pages,
+          {(pagination.total_pages > 1 || pagination.total > 0) && (
+            <div className="mt-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-zinc-600 dark:text-zinc-400">
+                  {t("creditRequest.showingResults", {
+                    from: (pagination.page - 1) * pagination.limit + 1,
+                    to: Math.min(
+                      pagination.page * pagination.limit,
+                      pagination.total
+                    ),
+                    total: pagination.total,
                   })}
-                </span>
-                <Button
-                  variant="outline"
-                  onClick={() => handlePageChange(pagination.page + 1)}
-                  disabled={pagination.page >= pagination.total_pages}
-                >
-                  {t("creditRequest.next")}
-                </Button>
+                </div>
+                <div className="flex items-center gap-3">
+                  <label className="text-sm text-zinc-600 dark:text-zinc-400">
+                    {t("creditRequest.itemsPerPage")}:
+                  </label>
+                  <select
+                    value={pagination.limit}
+                    onChange={(e) => handleLimitChange(parseInt(e.target.value, 10))}
+                    className="px-3 py-1.5 text-sm border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={50}>50</option>
+                  </select>
+                </div>
               </div>
+              {pagination.total_pages > 1 && (
+                <div className="flex items-center justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => handlePageChange(pagination.page - 1)}
+                    disabled={pagination.page === 1}
+                  >
+                    {t("creditRequest.previous")}
+                  </Button>
+                  <span className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400">
+                    {t("creditRequest.pageOf", {
+                      page: pagination.page,
+                      total: pagination.total_pages,
+                    })}
+                  </span>
+                  <Button
+                    variant="outline"
+                    onClick={() => handlePageChange(pagination.page + 1)}
+                    disabled={pagination.page >= pagination.total_pages}
+                  >
+                    {t("creditRequest.next")}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </>

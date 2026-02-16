@@ -15,9 +15,19 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/bank-provider", tags=["bank-provider"])
 
 
-@router.get("/information")
+@router.get(
+    "/information",
+    summary="Get bank information from provider",
+    description="Retrieves bank information from the provider for a given country and person. This endpoint is prepared for future integration with bank provider APIs. Currently returns a placeholder message indicating no API is connected. The architecture is ready to integrate country-specific bank providers when needed.",
+    responses={
+        200: {"description": "Bank information retrieved successfully (or not connected message)"},
+        400: {"description": "Bad request - invalid country, empty full name or identity document"},
+        401: {"description": "Unauthorized - invalid or missing authentication token"},
+        500: {"description": "Internal server error"}
+    }
+)
 async def get_bank_information_endpoint(
-    country: str = Query(..., description="Country code"),
+    country: str = Query(..., description="Country code (Brazil, Mexico, Spain, Portugal, Italy, Colombia)"),
     full_name: str = Query(..., description="Full name of the person"),
     identity_document: str = Query(..., description="Identity document number"),
     current_user: UserInDB = Depends(get_current_user_dependency)

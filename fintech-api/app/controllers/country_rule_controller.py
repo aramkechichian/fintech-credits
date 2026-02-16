@@ -28,7 +28,19 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/country-rules", tags=["country-rules"])
 
 
-@router.post("", response_model=CountryRuleResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=CountryRuleResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a new country rule",
+    description="Creates a new country-specific validation rule. Each country can have rules that define required document types, validation rules (e.g., amount to income ratio), and error messages. The rule will be associated with the user who created it.",
+    responses={
+        201: {"description": "Country rule created successfully"},
+        400: {"description": "Bad request - validation error or duplicate rule for country"},
+        401: {"description": "Unauthorized - invalid or missing authentication token"},
+        500: {"description": "Internal server error"}
+    }
+)
 async def create_rule(
     country_rule_data: CountryRuleCreate,
     current_user: UserInDB = Depends(get_current_user_dependency)
@@ -97,7 +109,17 @@ async def create_rule(
         )
 
 
-@router.get("", response_model=dict)
+@router.get(
+    "",
+    response_model=dict,
+    summary="Get all country rules",
+    description="Retrieves all country rules with optional pagination and filtering by active status. Returns a list of rules with pagination metadata (total count, skip, limit).",
+    responses={
+        200: {"description": "Country rules retrieved successfully"},
+        401: {"description": "Unauthorized - invalid or missing authentication token"},
+        500: {"description": "Internal server error"}
+    }
+)
 async def get_all_rules(
     current_user: UserInDB = Depends(get_current_user_dependency),
     skip: int = Query(0, ge=0, description="Number of records to skip"),
@@ -137,7 +159,18 @@ async def get_all_rules(
         )
 
 
-@router.get("/{rule_id}", response_model=CountryRuleResponse)
+@router.get(
+    "/{rule_id}",
+    response_model=CountryRuleResponse,
+    summary="Get country rule by ID",
+    description="Retrieves a specific country rule by its ID. Returns 404 if the rule is not found.",
+    responses={
+        200: {"description": "Country rule retrieved successfully"},
+        401: {"description": "Unauthorized - invalid or missing authentication token"},
+        404: {"description": "Country rule not found"},
+        500: {"description": "Internal server error"}
+    }
+)
 async def get_rule(
     rule_id: str,
     current_user: UserInDB = Depends(get_current_user_dependency)
@@ -174,7 +207,18 @@ async def get_rule(
         )
 
 
-@router.get("/country/{country}", response_model=CountryRuleResponse)
+@router.get(
+    "/country/{country}",
+    response_model=CountryRuleResponse,
+    summary="Get country rule by country",
+    description="Retrieves the active country rule for a specific country. This is useful when you need to get the validation rules that apply to a particular country. Returns 404 if no active rule is found for the country.",
+    responses={
+        200: {"description": "Country rule retrieved successfully"},
+        401: {"description": "Unauthorized - invalid or missing authentication token"},
+        404: {"description": "Active country rule not found for the specified country"},
+        500: {"description": "Internal server error"}
+    }
+)
 async def get_rule_by_country(
     country: Country,
     current_user: UserInDB = Depends(get_current_user_dependency)
@@ -211,7 +255,19 @@ async def get_rule_by_country(
         )
 
 
-@router.put("/{rule_id}", response_model=CountryRuleResponse)
+@router.put(
+    "/{rule_id}",
+    response_model=CountryRuleResponse,
+    summary="Update country rule",
+    description="Updates an existing country rule. Only the fields provided in the update data will be modified. The rule will be associated with the user who updated it. Returns 404 if the rule is not found.",
+    responses={
+        200: {"description": "Country rule updated successfully"},
+        400: {"description": "Bad request - validation error"},
+        401: {"description": "Unauthorized - invalid or missing authentication token"},
+        404: {"description": "Country rule not found"},
+        500: {"description": "Internal server error"}
+    }
+)
 async def update_rule(
     rule_id: str,
     update_data: CountryRuleUpdate,
@@ -294,7 +350,18 @@ async def update_rule(
         )
 
 
-@router.delete("/{rule_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{rule_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete country rule",
+    description="Deletes a country rule using soft delete (marks as deleted but doesn't remove from database). Returns 204 No Content on success. Returns 404 if the rule is not found.",
+    responses={
+        204: {"description": "Country rule deleted successfully"},
+        401: {"description": "Unauthorized - invalid or missing authentication token"},
+        404: {"description": "Country rule not found"},
+        500: {"description": "Internal server error"}
+    }
+)
 async def delete_rule(
     rule_id: str,
     current_user: UserInDB = Depends(get_current_user_dependency)

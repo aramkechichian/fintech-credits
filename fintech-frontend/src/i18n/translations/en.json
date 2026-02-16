@@ -91,6 +91,7 @@
     "pageOf": "Page {{page}} of {{total}}",
     "previous": "Previous",
     "next": "Next",
+    "itemsPerPage": "Items per page",
     "detailTitle": "Credit Request Details",
     "viewDetail": "View Detail",
     "consultBankSituation": "Consult Bank Situation",

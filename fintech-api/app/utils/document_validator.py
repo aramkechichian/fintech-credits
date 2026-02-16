@@ -5,6 +5,7 @@ import re
 from typing import Optional, Tuple
 from app.models.credit_request import Country
 from app.models.country_rule import DocumentType
+from app.utils.valid_documents_examples import ONE_EXAMPLE_PER_COUNTRY_CLEAN
 
 logger = None  # Will be initialized if needed
 
@@ -21,7 +22,8 @@ def validate_dni_spain(document: str) -> Tuple[bool, Optional[str]]:
     pattern = r'^[0-9]{8}[A-Z]$'
     
     if not re.match(pattern, document):
-        return False, "El DNI debe tener 8 dígitos seguidos de una letra (ej: 12345678Z)"
+        example = ONE_EXAMPLE_PER_COUNTRY_CLEAN.get("Spain", "12345678Z")
+        return False, f"El DNI debe tener 8 dígitos seguidos de una letra. Ejemplo válido: {example}"
     
     # Validate letter (DNI letter validation)
     digits = document[:8]
@@ -33,7 +35,8 @@ def validate_dni_spain(document: str) -> Tuple[bool, Optional[str]]:
     expected_letter = valid_letters[letter_index]
     
     if letter != expected_letter:
-        return False, f"La letra del DNI no es válida. Debería ser {expected_letter}"
+        example = ONE_EXAMPLE_PER_COUNTRY_CLEAN.get("Spain", "12345678Z")
+        return False, f"La letra del DNI no es válida. Debería ser {expected_letter}. Ejemplo válido: {example}"
     
     return True, None
 
@@ -50,7 +53,8 @@ def validate_nif_portugal(document: str) -> Tuple[bool, Optional[str]]:
     pattern = r'^[0-9]{9}$'
     
     if not re.match(pattern, document):
-        return False, "El NIF debe tener 9 dígitos"
+        example = ONE_EXAMPLE_PER_COUNTRY_CLEAN.get("Portugal", "123456789")
+        return False, f"El NIF debe tener 9 dígitos. Ejemplo válido: {example}"
     
     # Validate check digit
     if len(document) == 9:
@@ -68,7 +72,8 @@ def validate_nif_portugal(document: str) -> Tuple[bool, Optional[str]]:
             expected_check = 11 - remainder
         
         if check_digit != expected_check:
-            return False, "El dígito verificador del NIF no es válido"
+            example = ONE_EXAMPLE_PER_COUNTRY_CLEAN.get("Portugal", "123456789")
+            return False, f"El dígito verificador del NIF no es válido. Ejemplo válido: {example}"
     
     return True, None
 
@@ -85,7 +90,8 @@ def validate_cpf_brazil(document: str) -> Tuple[bool, Optional[str]]:
     pattern = r'^[0-9]{11}$'
     
     if not re.match(pattern, document):
-        return False, "El CPF debe tener 11 dígitos"
+        example = ONE_EXAMPLE_PER_COUNTRY_CLEAN.get("Brazil", "12345678909")
+        return False, f"El CPF debe tener 11 dígitos. Ejemplo válido: {example}"
     
     # Check for known invalid CPFs (all same digits)
     if len(set(document)) == 1:
@@ -101,7 +107,8 @@ def validate_cpf_brazil(document: str) -> Tuple[bool, Optional[str]]:
     check1 = 0 if remainder1 < 2 else 11 - remainder1
     
     if check1 != int(document[9]):
-        return False, "El primer dígito verificador del CPF no es válido"
+        example = ONE_EXAMPLE_PER_COUNTRY_CLEAN.get("Brazil", "12345678909")
+        return False, f"El primer dígito verificador del CPF no es válido. Ejemplo válido: {example}"
     
     # Second check digit
     digits.append(check1)
@@ -111,7 +118,8 @@ def validate_cpf_brazil(document: str) -> Tuple[bool, Optional[str]]:
     check2 = 0 if remainder2 < 2 else 11 - remainder2
     
     if check2 != int(document[10]):
-        return False, "El segundo dígito verificador del CPF no es válido"
+        example = ONE_EXAMPLE_PER_COUNTRY_CLEAN.get("Brazil", "12345678909")
+        return False, f"El segundo dígito verificador del CPF no es válido. Ejemplo válido: {example}"
     
     return True, None
 
@@ -129,7 +137,8 @@ def validate_curp_mexico(document: str) -> Tuple[bool, Optional[str]]:
     pattern = r'^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z][0-9]$'
     
     if not re.match(pattern, document):
-        return False, "El CURP debe tener 18 caracteres alfanuméricos en el formato correcto"
+        example = ONE_EXAMPLE_PER_COUNTRY_CLEAN.get("Mexico", "ABCD123456HDFXYZ01")
+        return False, f"El CURP debe tener 18 caracteres alfanuméricos en el formato correcto. Ejemplo válido: {example}"
     
     return True, None
 
@@ -146,7 +155,8 @@ def validate_codice_fiscale_italy(document: str) -> Tuple[bool, Optional[str]]:
     pattern = r'^[A-Z0-9]{16}$'
     
     if not re.match(pattern, document):
-        return False, "El Codice Fiscale debe tener 16 caracteres alfanuméricos"
+        example = ONE_EXAMPLE_PER_COUNTRY_CLEAN.get("Italy", "RSSMRA80A01H501U")
+        return False, f"El Codice Fiscale debe tener 16 caracteres alfanuméricos. Ejemplo válido: {example}"
     
     # Basic structure validation (not full algorithm, but format check)
     # Codice Fiscale has a specific structure but we'll do basic format validation
@@ -165,7 +175,8 @@ def validate_cedula_colombia(document: str) -> Tuple[bool, Optional[str]]:
     pattern = r'^[0-9]{8,10}$'
     
     if not re.match(pattern, document):
-        return False, "La Cédula de Ciudadanía debe tener entre 8 y 10 dígitos"
+        example = ONE_EXAMPLE_PER_COUNTRY_CLEAN.get("Colombia", "12345678")
+        return False, f"La Cédula de Ciudadanía debe tener entre 8 y 10 dígitos. Ejemplo válido: {example}"
     
     return True, None
 

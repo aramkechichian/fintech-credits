@@ -16,6 +16,7 @@ from app.services.log_service import log_request
 from app.services.country_rule_service import get_country_rule_by_country
 from app.models.country_rule import ValidationRule
 from app.utils.document_validator import validate_document_format
+from app.utils.valid_documents_examples import ONE_EXAMPLE_PER_COUNTRY_CLEAN
 
 logger = logging.getLogger(__name__)
 
@@ -62,11 +63,16 @@ async def validate_country_rules(
     )
     
     if not is_valid_doc:
+        # Get example for the country
+        country_name = country.value
+        example = ONE_EXAMPLE_PER_COUNTRY_CLEAN.get(country_name, "")
+        example_text = f". Ejemplo válido: {example}" if example else ""
+        
         error_detail = {
             "rule_type": "document_format",
             "required_document_type": country_rule.required_document_type,
             "provided_document": identity_document,
-            "error_message": doc_error or f"El formato del documento {country_rule.required_document_type} no es válido"
+            "error_message": doc_error or f"El formato del documento {country_rule.required_document_type} no es válido para {country.value}{example_text}"
         }
         validation_errors.append(error_detail)
     

@@ -91,6 +91,7 @@
     "pageOf": "Pagina {{page}} di {{total}}",
     "previous": "Precedente",
     "next": "Successivo",
+    "itemsPerPage": "Elementi per pagina",
     "detailTitle": "Dettagli della Richiesta di Credito",
     "viewDetail": "Visualizza Dettagli",
     "consultBankSituation": "Consulta Situazione Bancaria",

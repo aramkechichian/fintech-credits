@@ -91,6 +91,7 @@
     "pageOf": "Página {{page}} de {{total}}",
     "previous": "Anterior",
     "next": "Próximo",
+    "itemsPerPage": "Itens por página",
     "detailTitle": "Detalhes da Solicitação de Crédito",
     "viewDetail": "Ver Detalhes",
     "consultBankSituation": "Consultar Situação Bancária",

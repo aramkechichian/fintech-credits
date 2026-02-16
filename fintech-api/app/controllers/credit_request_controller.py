@@ -26,7 +26,19 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/credit-requests", tags=["credit-requests"])
 
-@router.post("", response_model=CreditRequestResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=CreditRequestResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a new credit request",
+    description="Creates a new credit request for the authenticated user. The request will be validated against country-specific rules before creation. If validation fails, the request will not be created and detailed error information will be returned.",
+    responses={
+        201: {"description": "Credit request created successfully"},
+        400: {"description": "Validation error - request does not meet country rules or invalid input data"},
+        401: {"description": "Unauthorized - invalid or missing authentication token"},
+        500: {"description": "Internal server error"}
+    }
+)
 async def create_request(
     credit_request_data: CreditRequestCreate,
     current_user: UserInDB = Depends(get_current_user_dependency)
@@ -131,7 +143,17 @@ async def create_request(
             detail="Error creating credit request"
         )
 
-@router.get("", response_model=List[CreditRequestResponse])
+@router.get(
+    "",
+    response_model=List[CreditRequestResponse],
+    summary="Get all credit requests for current user",
+    description="Retrieves all credit requests belonging to the authenticated user. Returns a list of credit requests ordered by creation date (newest first).",
+    responses={
+        200: {"description": "List of credit requests retrieved successfully"},
+        401: {"description": "Unauthorized - invalid or missing authentication token"},
+        500: {"description": "Internal server error"}
+    }
+)
 async def get_my_requests(
     current_user: UserInDB = Depends(get_current_user_dependency)
 ):
@@ -163,14 +185,24 @@ async def get_my_requests(
             detail="Error retrieving credit requests"
         )
 
-@router.get("/search", response_model=dict)
+@router.get(
+    "/search",
+    response_model=dict,
+    summary="Search credit requests with filters",
+    description="Searches credit requests with optional filters (countries, identity document, status) and pagination. Returns a paginated response with items, total count, page number, and total pages. Supports partial matching on identity document.",
+    responses={
+        200: {"description": "Search results retrieved successfully"},
+        401: {"description": "Unauthorized - invalid or missing authentication token"},
+        500: {"description": "Internal server error"}
+    }
+)
 async def search_requests(
     current_user: UserInDB = Depends(get_current_user_dependency),
     countries: Optional[List[str]] = Query(None, description="Filter by countries"),
     identity_document: Optional[str] = Query(None, description="Filter by identity document (partial match)"),
     status_filter: Optional[str] = Query(None, alias="status", description="Filter by status"),
     page: int = Query(1, ge=1, description="Page number"),
-    limit: int = Query(20, ge=1, le=100, description="Items per page")
+    limit: int = Query(5, ge=1, le=100, description="Items per page")
 ):
     """Search credit requests with filters and pagination"""
     try:
@@ -216,7 +248,19 @@ async def search_requests(
             detail="Error searching credit requests"
         )
 
-@router.put("/{request_id}")
+@router.put(
+    "/{request_id}",
+    summary="Update credit request status",
+    description="Updates the status and/or bank information of a credit request. Only the owner of the request can update it. Returns a message indicating the action taken (approved, rejected, or updated) along with the updated request data.",
+    responses={
+        200: {"description": "Credit request updated successfully"},
+        400: {"description": "Bad request - invalid input data"},
+        401: {"description": "Unauthorized - invalid or missing authentication token"},
+        403: {"description": "Forbidden - user does not have permission to update this request"},
+        404: {"description": "Credit request not found"},
+        500: {"description": "Internal server error"}
+    }
+)
 async def update_request(
     request_id: str,
     update_data: CreditRequestUpdate,
@@ -331,7 +375,19 @@ async def update_request(
             detail="Error updating credit request"
         )
 
-@router.get("/{request_id}", response_model=CreditRequestResponse)
+@router.get(
+    "/{request_id}",
+    response_model=CreditRequestResponse,
+    summary="Get credit request by ID",
+    description="Retrieves a specific credit request by its ID. Only the owner of the request can access it. Returns 404 if not found or 403 if the user doesn't have permission.",
+    responses={
+        200: {"description": "Credit request retrieved successfully"},
+        401: {"description": "Unauthorized - invalid or missing authentication token"},
+        403: {"description": "Forbidden - user does not have permission to access this request"},
+        404: {"description": "Credit request not found"},
+        500: {"description": "Internal server error"}
+    }
+)
 async def get_request(
     request_id: str,
     current_user: UserInDB = Depends(get_current_user_dependency)
