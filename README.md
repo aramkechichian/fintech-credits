@@ -13,6 +13,7 @@ make up
 **Frontend:**
 ```bash
 cd fintech-frontend
+npm install
 npm run dev
 ```
 

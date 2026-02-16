@@ -1,54 +1,40 @@
-# Detect Python command (python3, python, or py)
-PYTHON := $(shell command -v python3 2> /dev/null || command -v python 2> /dev/null || command -v py 2> /dev/null || echo python3)
+.PHONY: help up down test test-coverage test-unit bash
+APP_NAME ?= fintech-api
+COMPOSE_FILE := docker-compose.yml
 
-install:
-	$(PYTHON) -m pip install --upgrade pip setuptools wheel
-	$(PYTHON) -m pip install -e .
+# ====================================================================================================
+# Local Development - Day-to-Day Commands (macOS + Linux)
+# ====================================================================================================
 
-install-dev:
-	$(PYTHON) -m pip install --upgrade pip setuptools wheel
-	$(PYTHON) -m pip install -e ".[dev]"
+help:
+	@echo "Commands:"
+	@echo "  up            : Starts API + MongoDB (docker compose up --build)."
+	@echo "  down          : Stops and removes containers and volumes."
+	@echo "  test          : Runs tests inside the API container."
+	@echo "  test-coverage : Runs tests with coverage report."
+	@echo "  test-unit     : Runs unit tests only."
+	@echo "  bash          : Opens a shell in the API container."
 
-mongo-up:
-	@echo "Starting MongoDB..."
-	@docker compose up -d mongodb || echo "MongoDB already running or Docker not available"
+up:
+	@echo "Starting $(APP_NAME) and MongoDB..."
+	@docker compose -f $(COMPOSE_FILE) up --build
 
-mongo-down:
-	@echo "Stopping MongoDB..."
-	@docker compose stop mongodb || true
+down:
+	@echo "Stopping $(APP_NAME) services..."
+	@docker compose -f $(COMPOSE_FILE) down -v
 
-run: install mongo-up
-	$(PYTHON) -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 --log-level debug
-
-up: install mongo-up
-	$(PYTHON) -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --log-level info
-
-down: mongo-down
-	pkill -f "$(PYTHON) -m uvicorn app.main:app" || true
-
-# Testing commands
 test:
-	$(PYTHON) -m pytest -v
-
-test-unit:
-	$(PYTHON) -m pytest tests/unit -v
+	@echo "Running tests..."
+	@docker compose -f $(COMPOSE_FILE) run -T --rm api python -m pytest -v
 
 test-coverage:
-	$(PYTHON) -m pytest --cov=app --cov-report=html --cov-report=term-missing -v
+	@echo "Running tests with coverage..."
+	@docker compose -f $(COMPOSE_FILE) run -T --rm api python -m pytest --cov=app --cov-report=term-missing --cov-report=html -v
 
-test-coverage-xml:
-	$(PYTHON) -m pytest --cov=app --cov-report=xml --cov-report=term-missing -v
+test-unit:
+	@echo "Running unit tests..."
+	@docker compose -f $(COMPOSE_FILE) run -T --rm api python -m pytest tests/unit -v
 
-test-quick:
-	$(PYTHON) -m pytest -q --tb=short
-
-test-watch:
-	$(PYTHON) -m pytest-watch
-
-docker-up:
-	docker compose up --build
-
-docker-down:
-	docker compose down
-
-.PHONY: install install-dev mongo-up mongo-down run up down test test-unit test-coverage test-coverage-xml test-quick test-watch docker-up docker-down
+bash:
+	@echo "Opening container shell..."
+	@docker compose -f $(COMPOSE_FILE) exec api bash
