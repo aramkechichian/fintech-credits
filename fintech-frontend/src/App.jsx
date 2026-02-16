@@ -6,6 +6,7 @@ import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
 import CreditRequestsListPage from "./pages/CreditRequestsListPage";
 import CountryRulesPage from "./pages/CountryRulesPage";
+import AuditsPage from "./pages/AuditsPage";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import QuickSearchModal from "./components/QuickSearchModal";
@@ -24,6 +25,7 @@ function AppContent() {
       const path = window.location.pathname;
       if (path.startsWith("/credit-requests/search")) return "search";
       if (path === "/country-rules") return "country-rules";
+      if (path === "/audits") return "audits";
       if (path === "/" || path === "/home") return "home";
     }
     return isAuthenticated ? "home" : "login";
@@ -37,6 +39,8 @@ function AppContent() {
       window.history.pushState({ route: nextRoute }, "", "/country-rules");
     } else if (nextRoute === "search") {
       window.history.pushState({ route: nextRoute }, "", "/credit-requests/search");
+    } else if (nextRoute === "audits") {
+      window.history.pushState({ route: nextRoute }, "", "/audits");
     }
     
     // Update route state
@@ -72,6 +76,8 @@ function AppContent() {
         setRoute("search");
       } else if (path === "/country-rules") {
         setRoute("country-rules");
+      } else if (path === "/audits") {
+        setRoute("audits");
       } else if (path === "/" || path === "/home") {
         setRoute("home");
       }
@@ -91,6 +97,8 @@ function AppContent() {
         newRoute = "search";
       } else if (path === "/country-rules") {
         newRoute = "country-rules";
+      } else if (path === "/audits") {
+        newRoute = "audits";
       } else if (path === "/" || path === "/home") {
         newRoute = "home";
       }
@@ -129,6 +137,10 @@ function AppContent() {
 
     if (route === "country-rules") {
       return <CountryRulesPage />;
+    }
+
+    if (route === "audits") {
+      return <AuditsPage />;
     }
 
     if (route === "home") return <HomePage />;

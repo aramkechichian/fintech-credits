@@ -66,7 +66,6 @@ class CreditRequestInDB(CreditRequestBase):
     )
     
     id: Optional[ObjectId] = Field(default=None, alias="_id")
-    user_id: ObjectId  # Reference to user who created the request
     currency_code: CurrencyCode  # Currency code based on country
     request_date: datetime = Field(default_factory=datetime.utcnow)
     status: CreditRequestStatus = CreditRequestStatus.PENDING
@@ -77,7 +76,6 @@ class CreditRequestInDB(CreditRequestBase):
 class CreditRequestResponse(CreditRequestBase):
     """Credit request response schema"""
     id: str
-    user_id: str
     currency_code: CurrencyCode
     request_date: datetime
     status: CreditRequestStatus

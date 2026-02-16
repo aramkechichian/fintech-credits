@@ -9,6 +9,7 @@ from app.controllers.auth_controller import router as auth_router
 from app.controllers.credit_request_controller import router as credit_request_router
 from app.controllers.country_rule_controller import router as country_rule_router
 from app.controllers.bank_provider_controller import router as bank_provider_router
+from app.controllers.data_controller import router as data_router
 import logging
 import time
 
@@ -129,6 +130,7 @@ app.include_router(auth_router)
 app.include_router(credit_request_router)
 app.include_router(country_rule_router)
 app.include_router(bank_provider_router)
+app.include_router(data_router)
 
 @app.get("/health")
 def health():

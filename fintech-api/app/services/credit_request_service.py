@@ -123,7 +123,6 @@ async def validate_country_rules(
         )
 
 async def create_credit_request(
-    user_id: str,
     credit_request_data: CreditRequestCreate,
     bank_information: Optional[BankInformation] = None
 ) -> CreditRequestInDB:
@@ -143,7 +142,7 @@ async def create_credit_request(
     4. Notification system (email/SMS to user)
     5. Integration with external credit bureaus
     """
-    logger.info(f"Creating credit request for user {user_id}")
+    logger.info(f"Creating credit request")
     
     # Get currency code based on country
     # The country comes as a string from the API, so we need to convert it to the enum
@@ -165,7 +164,7 @@ async def create_credit_request(
             monthly_income=credit_request_data.monthly_income
         )
     except ValidationError as e:
-        logger.warning(f"Credit request validation failed for user {user_id}: {e.message}")
+        logger.warning(f"Credit request validation failed: {e.message}")
         # Re-raise the validation error with details
         raise
     
@@ -177,7 +176,6 @@ async def create_credit_request(
     
     # Create credit request object
     credit_request = CreditRequestInDB(
-        user_id=ObjectId(user_id),
         country=credit_request_data.country,
         currency_code=currency_code,
         full_name=credit_request_data.full_name,
@@ -253,9 +251,9 @@ async def get_credit_request_by_id(request_id: str) -> Optional[CreditRequestInD
     """Get a credit request by ID"""
     return await credit_request_repository.get_by_id(request_id)
 
-async def get_user_credit_requests(user_id: str) -> list[CreditRequestInDB]:
-    """Get all credit requests for a user"""
-    return await credit_request_repository.get_by_user_id(user_id)
+async def get_all_credit_requests() -> list[CreditRequestInDB]:
+    """Get all credit requests"""
+    return await credit_request_repository.get_all()
 
 async def update_credit_request_status(
     request_id: str,
@@ -287,10 +285,11 @@ async def update_credit_request_status(
     return updated_request
 
 async def search_credit_requests(
-    user_id: str,
     countries: Optional[list[str]] = None,
     identity_document: Optional[str] = None,
     status: Optional[str] = None,
+    request_date_from: Optional[datetime] = None,
+    request_date_to: Optional[datetime] = None,
     skip: int = 0,
     limit: int = 20
 ) -> tuple[list[CreditRequestInDB], int]:
@@ -301,10 +300,11 @@ async def search_credit_requests(
         tuple: (list of requests, total count)
     """
     return await credit_request_repository.search(
-        user_id=user_id,
         countries=countries,
         identity_document=identity_document,
         status=status,
+        request_date_from=request_date_from,
+        request_date_to=request_date_to,
         skip=skip,
         limit=limit
     )

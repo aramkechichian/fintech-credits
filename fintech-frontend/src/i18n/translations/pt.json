@@ -36,7 +36,9 @@
     "description": "Gerencie suas solicitações de crédito e acompanhe seu status",
     "startNewRequest": "Inicie uma nova solicitação de crédito",
     "searchCreditRequests": "Consultar Solicitações",
-    "searchDescription": "Busque e filtre suas solicitações de crédito"
+    "searchDescription": "Busque e filtre suas solicitações de crédito",
+    "audits": "Auditorias",
+    "auditsDescription": "Exporte dados de solicitações de crédito para Excel com filtros personalizados"
   },
   "header": {
     "logout": "Sair",
@@ -194,6 +196,39 @@
       "updateFailed": "Erro ao atualizar a regra",
       "deleteFailed": "Erro ao excluir a regra",
       "loadFailed": "Erro ao carregar as regras"
+    }
+  },
+  "audits": {
+    "title": "Auditorias",
+    "description": "Exporte dados de solicitações de crédito para Excel",
+    "filters": "Filtros",
+    "selectFields": "Selecionar Campos",
+    "selectFieldsDescription": "Selecione os campos que deseja incluir na exportação",
+    "export": "Exportar para Excel",
+    "exporting": "Exportando...",
+    "exportSuccess": "Arquivo Excel gerado com sucesso",
+    "exportError": "Erro ao exportar dados",
+    "noDataFound": "Nenhum dado encontrado que corresponda aos filtros selecionados",
+    "selectAll": "Selecionar Todos",
+    "deselectAll": "Desselecionar Todos",
+    "noFieldsSelected": "Você deve selecionar pelo menos um campo para exportar",
+    "loadingFields": "Carregando campos disponíveis...",
+    "fieldsError": "Erro ao carregar campos disponíveis",
+    "requestDateFrom": "Data da Solicitação Desde",
+    "requestDateTo": "Data da Solicitação Até",
+    "fields": {
+      "id": "ID",
+      "country": "País",
+      "currency_code": "Código da Moeda",
+      "full_name": "Nome Completo",
+      "email": "Email",
+      "identity_document": "Documento de Identidade",
+      "requested_amount": "Valor Solicitado",
+      "monthly_income": "Renda Mensal",
+      "request_date": "Data da Solicitação",
+      "status": "Status",
+      "created_at": "Data de Criação",
+      "updated_at": "Data de Atualização"
     }
   }
 }

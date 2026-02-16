@@ -36,7 +36,9 @@
     "description": "Manage your credit requests and track their status",
     "startNewRequest": "Start a new credit request",
     "searchCreditRequests": "Search Credit Requests",
-    "searchDescription": "Search and filter your credit requests"
+    "searchDescription": "Search and filter your credit requests",
+    "audits": "Audits",
+    "auditsDescription": "Export credit request data to Excel with custom filters"
   },
   "header": {
     "logout": "Logout",
@@ -195,6 +197,39 @@
       "updateFailed": "Error updating rule",
       "deleteFailed": "Error deleting rule",
       "loadFailed": "Error loading rules"
+    }
+  },
+  "audits": {
+    "title": "Audits",
+    "description": "Export credit request data to Excel",
+    "filters": "Filters",
+    "selectFields": "Select Fields",
+    "selectFieldsDescription": "Select the fields you want to include in the export",
+    "export": "Export to Excel",
+    "exporting": "Exporting...",
+    "exportSuccess": "Excel file generated successfully",
+    "exportError": "Error exporting data",
+    "noDataFound": "No data found matching the selected filters",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "noFieldsSelected": "You must select at least one field to export",
+    "loadingFields": "Loading available fields...",
+    "fieldsError": "Error loading available fields",
+    "requestDateFrom": "Request Date From",
+    "requestDateTo": "Request Date To",
+    "fields": {
+      "id": "ID",
+      "country": "Country",
+      "currency_code": "Currency Code",
+      "full_name": "Full Name",
+      "email": "Email",
+      "identity_document": "Identity Document",
+      "requested_amount": "Requested Amount",
+      "monthly_income": "Monthly Income",
+      "request_date": "Request Date",
+      "status": "Status",
+      "created_at": "Creation Date",
+      "updated_at": "Update Date"
     }
   }
 }

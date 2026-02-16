@@ -14,7 +14,7 @@ from app.models.user import UserInDB
 from app.services.credit_request_service import (
     create_credit_request,
     get_credit_request_by_id,
-    get_user_credit_requests,
+    get_all_credit_requests,
     update_credit_request_status,
     search_credit_requests,
     ValidationError
@@ -45,7 +45,7 @@ async def create_request(
 ):
     """Create a new credit request"""
     try:
-        logger.info(f"Creating credit request for user {current_user.id}")
+        logger.info(f"Creating credit request")
         
         # TODO: Fetch bank information from provider
         # This should be implemented based on the country and provider integration
@@ -57,14 +57,12 @@ async def create_request(
         # )
         
         credit_request = await create_credit_request(
-            user_id=str(current_user.id),
             credit_request_data=credit_request_data,
             bank_information=bank_information
         )
         
         response = CreditRequestResponse(
             id=str(credit_request.id),
-            user_id=str(credit_request.user_id),
             country=credit_request.country,
             currency_code=credit_request.currency_code,
             full_name=credit_request.full_name,
@@ -158,13 +156,12 @@ async def create_request(
 async def get_my_requests(
     current_user: UserInDB = Depends(get_current_user_dependency)
 ):
-    """Get all credit requests for the current user"""
+    """Get all credit requests"""
     try:
-        requests = await get_user_credit_requests(str(current_user.id))
+        requests = await get_all_credit_requests()
         return [
             CreditRequestResponse(
                 id=str(req.id),
-                user_id=str(req.user_id),
                 country=req.country,
                 currency_code=req.currency_code,
                 full_name=req.full_name,
@@ -211,7 +208,6 @@ async def search_requests(
         skip = (page - 1) * limit
         
         requests, total_count = await search_credit_requests(
-            user_id=str(current_user.id),
             countries=countries,
             identity_document=identity_document,
             status=status_filter,
@@ -223,7 +219,6 @@ async def search_requests(
             "items": [
                 CreditRequestResponse(
                     id=str(req.id),
-                    user_id=str(req.user_id),
                     country=req.country,
                     currency_code=req.currency_code,
                     full_name=req.full_name,
@@ -280,13 +275,6 @@ async def update_request(
                 detail="Credit request not found"
             )
         
-        # Verify the request belongs to the current user
-        if str(credit_request.user_id) != str(current_user.id):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You don't have permission to update this credit request"
-            )
-        
         # Prepare update data
         new_status = update_data.status if update_data.status else credit_request.status
         bank_info = update_data.bank_information if update_data.bank_information else credit_request.bank_information
@@ -314,14 +302,8 @@ async def update_request(
             is_success=True
         )
         
-        # TODO: Send email notification to user when status changes to approved or rejected
-        # if new_status in [CreditRequestStatus.APPROVED, CreditRequestStatus.REJECTED]:
-        #     from app.repositories.user_repository import user_repository
-        #     user = await user_repository.get_by_id(str(updated_request.user_id))
-        #     if user:
-        #         await send_email(
-        #             to=user.email,
-        #             subject=f"Credit Request {new_status.value}",
+        # TODO: Send email notification when status changes to approved or rejected
+        # Email is sent to the email address in the credit request
         #             body=f"Your credit request has been {new_status.value}."
         #         )
         
@@ -408,16 +390,8 @@ async def get_request(
                 detail="Credit request not found"
             )
         
-        # Verify the request belongs to the current user
-        if str(credit_request.user_id) != str(current_user.id):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You don't have permission to access this credit request"
-            )
-        
         return CreditRequestResponse(
             id=str(credit_request.id),
-            user_id=str(credit_request.user_id),
             country=credit_request.country,
             currency_code=credit_request.currency_code,
             full_name=credit_request.full_name,

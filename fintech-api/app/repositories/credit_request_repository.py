@@ -1,5 +1,5 @@
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.core.database import get_database
 from app.models.credit_request import CreditRequestInDB
 from bson import ObjectId
@@ -24,14 +24,6 @@ class CreditRequestRepository:
             return CreditRequestInDB(**request_doc)
         return None
 
-    async def get_by_user_id(self, user_id: str) -> List[CreditRequestInDB]:
-        """Get all credit requests for a user"""
-        db = get_database()
-        cursor = db[self.collection_name].find({"user_id": ObjectId(user_id)})
-        requests = []
-        async for doc in cursor:
-            requests.append(CreditRequestInDB(**doc))
-        return requests
 
     async def get_all(self, skip: int = 0, limit: int = 100) -> List[CreditRequestInDB]:
         """Get all credit requests with pagination"""
@@ -44,10 +36,11 @@ class CreditRequestRepository:
 
     async def search(
         self,
-        user_id: Optional[str] = None,
         countries: Optional[List[str]] = None,
         identity_document: Optional[str] = None,
         status: Optional[str] = None,
+        request_date_from: Optional[datetime] = None,
+        request_date_to: Optional[datetime] = None,
         skip: int = 0,
         limit: int = 20
     ) -> tuple[List[CreditRequestInDB], int]:
@@ -62,10 +55,6 @@ class CreditRequestRepository:
         # Build query
         query = {}
         
-        # Filter by user_id (users can only see their own requests)
-        if user_id:
-            query["user_id"] = ObjectId(user_id)
-        
         # Filter by countries
         if countries and len(countries) > 0:
             query["country"] = {"$in": countries}
@@ -77,6 +66,16 @@ class CreditRequestRepository:
         # Filter by status
         if status:
             query["status"] = status
+        
+        # Filter by request date range
+        if request_date_from or request_date_to:
+            date_query = {}
+            if request_date_from:
+                date_query["$gte"] = request_date_from
+            if request_date_to:
+                # Add one day to include the entire end date
+                date_query["$lte"] = request_date_to + timedelta(days=1)
+            query["request_date"] = date_query
         
         # Get total count
         total_count = await db[self.collection_name].count_documents(query)
