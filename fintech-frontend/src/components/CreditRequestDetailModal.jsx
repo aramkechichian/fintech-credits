@@ -149,6 +149,13 @@ export default function CreditRequestDetailModal({ isOpen, onClose, requestId, o
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-1">
+                  {t("creditRequest.requestNumber")}
+                </label>
+                <p className="text-zinc-900 dark:text-zinc-50 font-mono text-sm">{request.id}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-1">
                   {t("creditRequest.country")}
                 </label>
                 <p className="text-zinc-900 dark:text-zinc-50">{request.country}</p>

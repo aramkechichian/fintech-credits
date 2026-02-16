@@ -1,3 +1,6 @@
+"""
+Log service for logging and querying logs
+"""
 from typing import Optional, Any
 from datetime import datetime
 from bson import ObjectId
@@ -70,3 +73,27 @@ async def log_request(
             error_message=error_message,
             created_at=datetime.utcnow()
         )
+
+
+async def search_logs(
+    method: Optional[str] = None,
+    endpoint: Optional[str] = None,
+    date_from: Optional[datetime] = None,
+    date_to: Optional[datetime] = None,
+    skip: int = 0,
+    limit: int = 20
+) -> tuple[list[LogDataInDB], int]:
+    """
+    Search logs with filters and pagination
+    
+    Returns:
+        tuple: (list of logs, total count)
+    """
+    return await log_data_repository.search(
+        method=method,
+        endpoint=endpoint,
+        date_from=date_from,
+        date_to=date_to,
+        skip=skip,
+        limit=limit
+    )

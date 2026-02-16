@@ -11,6 +11,7 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import QuickSearchModal from "./components/QuickSearchModal";
 import CreditRequestDetailModal from "./components/CreditRequestDetailModal";
+import TestModeModal from "./components/TestModeModal";
 import { creditRequestApi } from "./api/creditRequestApi";
 import { translateError } from "./utils/errorTranslator";
 
@@ -20,6 +21,7 @@ function AppContent() {
   const [isQuickSearchModalOpen, setIsQuickSearchModalOpen] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isTestModeModalOpen, setIsTestModeModalOpen] = useState(false);
   const [route, setRoute] = useState(() => {
     if (typeof window !== "undefined") {
       const path = window.location.pathname;
@@ -175,6 +177,7 @@ function AppContent() {
           currentRoute={route} 
           onNavigate={handleNavigate}
           onOpenQuickSearch={() => setIsQuickSearchModalOpen(true)}
+          onOpenTestMode={() => setIsTestModeModalOpen(true)}
         />
         <main className="flex-1 ml-64 px-8 py-8 max-w-full">
           {Page}
@@ -200,6 +203,11 @@ function AppContent() {
             window.dispatchEvent(new Event("locationchange"));
           }
         }}
+      />
+      
+      <TestModeModal
+        isOpen={isTestModeModalOpen}
+        onClose={() => setIsTestModeModalOpen(false)}
       />
     </div>
   );

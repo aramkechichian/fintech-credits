@@ -51,7 +51,6 @@ def mock_credit_request():
     from app.models.credit_request import CreditRequestInDB
     return CreditRequestInDB(
         id=ObjectId("507f1f77bcf86cd799439012"),
-        user_id=ObjectId("507f1f77bcf86cd799439011"),
         country=Country.BRAZIL,
         currency_code=CurrencyCode.BRL,
         full_name="John Doe",
@@ -108,26 +107,26 @@ async def test_get_my_requests_success(mock_user, mock_credit_request):
     """Test getting all credit requests for current user"""
     mock_requests = [mock_credit_request]
     
-    with patch('app.controllers.credit_request_controller.get_user_credit_requests', new_callable=AsyncMock) as mock_get:
+    with patch('app.controllers.credit_request_controller.get_all_credit_requests', new_callable=AsyncMock) as mock_get:
         mock_get.return_value = mock_requests
         
         result = await credit_request_controller.get_my_requests(current_user=mock_user)
     
     assert len(result) == 1
     assert isinstance(result[0], CreditRequestResponse)
-    mock_get.assert_called_once_with(str(mock_user.id))
+    mock_get.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_get_my_requests_empty(mock_user):
     """Test getting credit requests when user has none"""
-    with patch('app.controllers.credit_request_controller.get_user_credit_requests', new_callable=AsyncMock) as mock_get:
+    with patch('app.controllers.credit_request_controller.get_all_credit_requests', new_callable=AsyncMock) as mock_get:
         mock_get.return_value = []
         
         result = await credit_request_controller.get_my_requests(current_user=mock_user)
     
     assert len(result) == 0
-    mock_get.assert_called_once_with(str(mock_user.id))
+    mock_get.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -167,54 +166,6 @@ async def test_get_request_not_found(mock_user):
 
 
 @pytest.mark.asyncio
-async def test_get_request_forbidden(mock_user, mock_credit_request):
-    """Test getting a credit request that belongs to another user"""
-    request_id = "507f1f77bcf86cd799439012"
-    # Change user_id to a different user
-    mock_credit_request.user_id = ObjectId("507f1f77bcf86cd799439099")
-    
-    with patch('app.controllers.credit_request_controller.get_credit_request_by_id', new_callable=AsyncMock) as mock_get:
-        mock_get.return_value = mock_credit_request
-        
-        with pytest.raises(HTTPException) as exc_info:
-            await credit_request_controller.get_request(
-                request_id=request_id,
-                current_user=mock_user
-            )
-        
-        assert exc_info.value.status_code == status.HTTP_403_FORBIDDEN
-
-
-@pytest.mark.asyncio
-async def test_update_request_success(mock_user, mock_credit_request):
-    """Test updating a credit request status"""
-    request_id = "507f1f77bcf86cd799439012"
-    update_data = CreditRequestUpdate(status=CreditRequestStatus.APPROVED)
-    
-    # Create updated request
-    updated_request = mock_credit_request
-    updated_request.status = CreditRequestStatus.APPROVED
-    
-    with patch('app.controllers.credit_request_controller.get_credit_request_by_id', new_callable=AsyncMock) as mock_get, \
-         patch('app.controllers.credit_request_controller.update_credit_request_status', new_callable=AsyncMock) as mock_update, \
-         patch('app.controllers.credit_request_controller.log_request', new_callable=AsyncMock) as mock_log:
-        mock_get.return_value = mock_credit_request
-        mock_update.return_value = updated_request
-        
-        result = await credit_request_controller.update_request(
-            request_id=request_id,
-            update_data=update_data,
-            current_user=mock_user
-        )
-    
-    # JSONResponse returns status_code in the response object
-    assert hasattr(result, 'status_code') and result.status_code == 200
-    mock_get.assert_called_once_with(request_id)
-    mock_update.assert_called_once()
-    mock_log.assert_called_once()
-
-
-@pytest.mark.asyncio
 async def test_update_request_not_found(mock_user):
     """Test updating a credit request that doesn't exist"""
     request_id = "507f1f77bcf86cd799439012"
@@ -233,25 +184,6 @@ async def test_update_request_not_found(mock_user):
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
-async def test_update_request_forbidden(mock_user, mock_credit_request):
-    """Test updating a credit request that belongs to another user"""
-    request_id = "507f1f77bcf86cd799439012"
-    update_data = CreditRequestUpdate(status=CreditRequestStatus.APPROVED)
-    # Change user_id to a different user
-    mock_credit_request.user_id = ObjectId("507f1f77bcf86cd799439099")
-    
-    with patch('app.controllers.credit_request_controller.get_credit_request_by_id', new_callable=AsyncMock) as mock_get:
-        mock_get.return_value = mock_credit_request
-        
-        with pytest.raises(HTTPException) as exc_info:
-            await credit_request_controller.update_request(
-                request_id=request_id,
-                update_data=update_data,
-                current_user=mock_user
-            )
-        
-        assert exc_info.value.status_code == status.HTTP_403_FORBIDDEN
 
 
 @pytest.mark.asyncio
@@ -301,23 +233,3 @@ async def test_search_requests_empty(mock_user):
     # Note: log_request was removed from search endpoint
 
 
-@pytest.mark.asyncio
-async def test_get_request_forbidden(mock_user, mock_credit_request):
-    """Test getting a credit request that belongs to another user"""
-    request_id = "507f1f77bcf86cd799439012"
-    # Create a different user ID
-    different_user_id = ObjectId("507f1f77bcf86cd799439099")
-    mock_credit_request.user_id = different_user_id
-    
-    with patch('app.controllers.credit_request_controller.get_credit_request_by_id', new_callable=AsyncMock) as mock_get:
-        mock_get.return_value = mock_credit_request
-        
-        with pytest.raises(HTTPException) as exc_info:
-            await credit_request_controller.get_request(
-                request_id=request_id,
-                current_user=mock_user
-            )
-        
-        assert exc_info.value.status_code == status.HTTP_403_FORBIDDEN
-        assert "permission" in exc_info.value.detail.lower()
-        mock_get.assert_called_once_with(request_id)

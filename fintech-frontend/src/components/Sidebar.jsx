@@ -1,6 +1,6 @@
 import { useTranslation } from "../i18n/I18nContext";
 
-export default function Sidebar({ currentRoute, onNavigate, onOpenQuickSearch }) {
+export default function Sidebar({ currentRoute, onNavigate, onOpenQuickSearch, onOpenTestMode }) {
   const { t } = useTranslation();
 
   const menuItems = [
@@ -22,6 +22,12 @@ export default function Sidebar({ currentRoute, onNavigate, onOpenQuickSearch })
       icon: "🔍",
       action: "quick-search",
     },
+    {
+      id: "test-mode",
+      label: t("sidebar.testMode"),
+      icon: "🧪",
+      action: "test-mode",
+    },
   ];
 
   return (
@@ -35,6 +41,8 @@ export default function Sidebar({ currentRoute, onNavigate, onOpenQuickSearch })
                   e.preventDefault();
                   if (item.action === "quick-search" && onOpenQuickSearch) {
                     onOpenQuickSearch();
+                  } else if (item.action === "test-mode" && onOpenTestMode) {
+                    onOpenTestMode();
                   } else if (item.route && onNavigate) {
                     onNavigate(item.route);
                   }

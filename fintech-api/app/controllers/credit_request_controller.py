@@ -320,7 +320,6 @@ async def update_request(
         
         response_data = CreditRequestResponse(
             id=str(updated_request.id),
-            user_id=str(updated_request.user_id),
             country=updated_request.country,
             currency_code=updated_request.currency_code,
             full_name=updated_request.full_name,

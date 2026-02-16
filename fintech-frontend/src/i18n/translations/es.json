@@ -38,7 +38,9 @@
     "searchCreditRequests": "Consultar Solicitudes",
     "searchDescription": "Busca y filtra tus solicitudes de crédito",
     "audits": "Auditorías",
-    "auditsDescription": "Exporta datos de solicitudes de crédito a Excel con filtros personalizados"
+    "auditsDescription": "Exporta datos de solicitudes de crédito a Excel con filtros personalizados",
+    "logs": "Logs",
+    "logsDescription": "Consulta y exporta logs del sistema por fecha, método y endpoint"
   },
   "header": {
     "logout": "Cerrar Sesión",
@@ -55,6 +57,7 @@
   },
   "creditRequest": {
     "createTitle": "Crear Solicitud de Crédito",
+    "requestNumber": "Número de Solicitud",
     "country": "País",
     "selectCountry": "Selecciona un país",
     "fullName": "Nombre Completo",
@@ -159,7 +162,25 @@
   },
   "sidebar": {
     "home": "Inicio",
-    "manageCountryRules": "Gestionar Reglas de Países"
+    "manageCountryRules": "Gestionar Reglas de Países",
+    "testMode": "Modo de Prueba"
+  },
+  "testMode": {
+    "title": "Modo de Prueba",
+    "description": "Esta herramienta está diseñada para facilitar las pruebas del challenge. Permite generar datos de prueba y limpiar la base de datos para reiniciar las pruebas.",
+    "generateButton": "Generar Solicitudes de Crédito",
+    "clearButton": "Limpiar Solicitudes de Crédito",
+    "generating": "Generando...",
+    "clearing": "Limpiando...",
+    "generateSuccess": "Se generaron {{count}} solicitudes exitosamente",
+    "clearSuccess": "Se eliminaron {{count}} solicitudes exitosamente",
+    "generateError": "Error al generar solicitudes",
+    "clearError": "Error al limpiar solicitudes",
+    "confirmTitle": "Confirmar",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "confirmGenerate": "¿Estás seguro de que deseas generar 50 solicitudes de crédito de prueba?",
+    "confirmClear": "¿Estás seguro de que deseas eliminar TODAS las solicitudes de crédito? Esta acción no se puede deshacer."
   },
   "countryRules": {
     "title": "Gestión de Reglas de Países",
@@ -227,5 +248,41 @@
       "created_at": "Fecha de Creación",
       "updated_at": "Fecha de Actualización"
     }
+  },
+  "logs": {
+    "title": "Logs del Sistema",
+    "filters": "Filtros",
+    "allMethods": "Todos los Métodos",
+    "method": "Método HTTP",
+    "module": "Módulo",
+    "allModules": "Todos los Módulos",
+    "modules": {
+      "creditRequests": "Solicitud de Crédito",
+      "countryRules": "Reglas de Países",
+      "authentication": "Autenticación",
+      "bankProvider": "Proveedor Bancario",
+      "audits": "Auditorías",
+      "logs": "Logs"
+    },
+    "dateFrom": "Fecha Desde",
+    "dateTo": "Fecha Hasta",
+    "search": "Buscar",
+    "resetFilters": "Limpiar Filtros",
+    "loading": "Cargando logs...",
+    "searchError": "Error al buscar logs",
+    "noResults": "No se encontraron logs",
+    "export": "Exportar a Excel",
+    "exporting": "Exportando...",
+    "exportError": "Error al exportar logs",
+    "noDataFound": "No se encontraron datos que coincidan con los filtros seleccionados",
+    "responseStatus": "Estado de Respuesta",
+    "isSuccess": "Éxito",
+    "createdAt": "Fecha de Creación",
+    "yes": "Sí",
+    "no": "No",
+    "showingResults": "Mostrando {{from}} a {{to}} de {{total}} resultados",
+    "pageOf": "Página {{page}} de {{total}}",
+    "previous": "Anterior",
+    "next": "Siguiente"
   }
 }

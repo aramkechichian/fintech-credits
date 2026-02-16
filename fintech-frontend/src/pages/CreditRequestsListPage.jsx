@@ -144,9 +144,9 @@ export default function CreditRequestsListPage() {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("es-ES", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
     }).format(date);
   };
 
@@ -222,31 +222,34 @@ export default function CreditRequestsListPage() {
         <>
           <Card className="p-0 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full text-xs">
                 <thead className="bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <th className="px-2 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                      {t("creditRequest.requestNumber")}
+                    </th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                       {t("creditRequest.country")}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <th className="px-2 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                       {t("creditRequest.fullName")}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <th className="px-2 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                       {t("creditRequest.email")}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <th className="px-2 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                       {t("creditRequest.identityDocument")}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <th className="px-2 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                       {t("creditRequest.requestedAmount")}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <th className="px-2 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                       {t("creditRequest.status._label")}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <th className="px-2 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                       {t("creditRequest.requestDate")}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <th className="px-2 py-2 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                       {t("creditRequest.actions")}
                     </th>
                   </tr>
@@ -257,45 +260,54 @@ export default function CreditRequestsListPage() {
                       key={request.id}
                       className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-50">
+                      <td className="px-2 py-2 whitespace-nowrap text-xs text-zinc-900 dark:text-zinc-50 font-mono">
+                        <span className="truncate block max-w-[100px]">{request.id}</span>
+                      </td>
+                      <td className="px-2 py-2 whitespace-nowrap text-xs text-zinc-900 dark:text-zinc-50">
                         {request.country}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-50">
-                        {request.full_name}
+                      <td className="px-2 py-2 text-xs text-zinc-900 dark:text-zinc-50">
+                        <span className="truncate block max-w-[120px]" title={request.full_name}>
+                          {request.full_name}
+                        </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-50">
-                        {request.email}
+                      <td className="px-2 py-2 text-xs text-zinc-900 dark:text-zinc-50">
+                        <span className="truncate block max-w-[150px]" title={request.email}>
+                          {request.email}
+                        </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-50">
-                        {request.identity_document}
+                      <td className="px-2 py-2 whitespace-nowrap text-xs text-zinc-900 dark:text-zinc-50">
+                        <span className="truncate block max-w-[100px]" title={request.identity_document}>
+                          {request.identity_document}
+                        </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-50">
+                      <td className="px-2 py-2 whitespace-nowrap text-xs text-zinc-900 dark:text-zinc-50">
                         {formatCurrency(
                           request.requested_amount,
                           request.currency_code
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-2 py-2 whitespace-nowrap">
                         <span
-                          className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          className={`px-1.5 py-0.5 text-xs font-medium rounded-full ${
                             STATUS_COLORS[request.status] || STATUS_COLORS.pending
                           }`}
                         >
                           {t(`creditRequest.status.${request.status}`) || request.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-400">
+                      <td className="px-2 py-2 whitespace-nowrap text-xs text-zinc-600 dark:text-zinc-400">
                         {formatDate(request.request_date)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <div className="flex gap-2">
+                      <td className="px-2 py-2 whitespace-nowrap">
+                        <div className="flex gap-1">
                           <Button
                             variant="outline"
                             onClick={() => {
                               setSelectedRequestId(request.id);
                               setIsDetailModalOpen(true);
                             }}
-                            className="text-xs px-3 py-1"
+                            className="text-xs px-2 py-1"
                           >
                             {t("creditRequest.viewDetail")}
                           </Button>
@@ -337,7 +349,7 @@ export default function CreditRequestsListPage() {
                                 setBankInfoLoading(false);
                               }
                             }}
-                            className="text-xs px-3 py-1"
+                            className="text-xs px-2 py-1"
                           >
                             {t("creditRequest.consultBankSituation")}
                           </Button>

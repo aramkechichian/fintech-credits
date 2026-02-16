@@ -34,7 +34,6 @@ def mock_credit_request():
     """Create a mock credit request"""
     return CreditRequestInDB(
         id=ObjectId("507f1f77bcf86cd799439012"),
-        user_id=ObjectId("507f1f77bcf86cd799439011"),
         country=Country.BRAZIL,
         currency_code=CurrencyCode.BRL,
         full_name="John Doe",
@@ -113,54 +112,6 @@ async def test_get_by_id_not_found(repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_get_by_user_id(repository, mock_database):
-    """Test getting credit requests by user ID"""
-    db, collection = mock_database
-    
-    request_docs = [
-        {
-            "_id": ObjectId("507f1f77bcf86cd799439012"),
-            "user_id": ObjectId("507f1f77bcf86cd799439011"),
-            "country": "Brazil",
-            "currency_code": "BRL",
-            "full_name": "John Doe",
-            "email": "john.doe@example.com",
-            "identity_document": "123456789",
-            "requested_amount": 10000.0,
-            "monthly_income": 5000.0,
-            "request_date": datetime.utcnow(),
-            "status": "pending",
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow()
-        }
-    ]
-    
-    class AsyncIterator:
-        def __init__(self, items):
-            self.items = items
-        
-        def __aiter__(self):
-            return self
-        
-        async def __anext__(self):
-            if not self.items:
-                raise StopAsyncIteration
-            return self.items.pop(0)
-    
-    async_iterator = AsyncIterator(request_docs)
-    mock_cursor = MagicMock()
-    mock_cursor.__aiter__ = lambda self: async_iterator
-    
-    collection.find = MagicMock(return_value=mock_cursor)
-    
-    with patch('app.repositories.credit_request_repository.get_database', return_value=db):
-        results = await repository.get_by_user_id("507f1f77bcf86cd799439011")
-    
-    assert len(results) == 1
-    assert str(results[0].id) == "507f1f77bcf86cd799439012"
-
-
-@pytest.mark.asyncio
 async def test_update_credit_request(repository, mock_database):
     """Test updating a credit request"""
     db, collection = mock_database
@@ -205,7 +156,6 @@ async def test_search_credit_requests(repository, mock_database):
     request_docs = [
         {
             "_id": ObjectId("507f1f77bcf86cd799439012"),
-            "user_id": ObjectId("507f1f77bcf86cd799439011"),
             "country": "Brazil",
             "currency_code": "BRL",
             "full_name": "John Doe",
@@ -245,7 +195,6 @@ async def test_search_credit_requests(repository, mock_database):
     
     with patch('app.repositories.credit_request_repository.get_database', return_value=db):
         results, total = await repository.search(
-            user_id="507f1f77bcf86cd799439011",
             countries=["Brazil"],
             status="pending",
             skip=0,

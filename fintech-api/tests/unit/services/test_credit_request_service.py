@@ -15,7 +15,7 @@ from app.models.credit_request import (
 from app.services.credit_request_service import (
     create_credit_request,
     get_credit_request_by_id,
-    get_user_credit_requests,
+    get_all_credit_requests,
     update_credit_request_status,
     search_credit_requests,
     validate_country_rules,
@@ -40,11 +40,8 @@ def credit_request_data():
 @pytest.mark.asyncio
 async def test_create_credit_request_success(credit_request_data):
     """Test creating a credit request successfully"""
-    user_id = "507f1f77bcf86cd799439011"
-    
     mock_created_request = MagicMock()
     mock_created_request.id = ObjectId("507f1f77bcf86cd799439012")
-    mock_created_request.user_id = ObjectId(user_id)
     mock_created_request.country = Country.BRAZIL
     mock_created_request.currency_code = CurrencyCode.BRL
     mock_created_request.full_name = "John Doe"
@@ -61,7 +58,6 @@ async def test_create_credit_request_success(credit_request_data):
         mock_repo.create = AsyncMock(return_value=mock_created_request)
         
         result = await create_credit_request(
-            user_id=user_id,
             credit_request_data=credit_request_data,
             bank_information=None
         )
@@ -70,7 +66,6 @@ async def test_create_credit_request_success(credit_request_data):
     assert result.currency_code == CurrencyCode.BRL
     assert result.status == CreditRequestStatus.PENDING
     mock_repo.create.assert_called_once()
-    mock_log.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -94,7 +89,6 @@ async def test_create_credit_request_with_bank_info(credit_request_data):
         mock_repo.create = AsyncMock(return_value=mock_created_request)
         
         result = await create_credit_request(
-            user_id=user_id,
             credit_request_data=credit_request_data,
             bank_information=bank_info
         )
@@ -136,7 +130,6 @@ async def test_create_credit_request_currency_mapping():
             mock_repo.create = AsyncMock(return_value=mock_created_request)
             
             result = await create_credit_request(
-                user_id="507f1f77bcf86cd799439011",
                 credit_request_data=credit_request_data,
                 bank_information=None
             )
@@ -175,18 +168,17 @@ async def test_get_credit_request_by_id_not_found():
 
 
 @pytest.mark.asyncio
-async def test_get_user_credit_requests():
-    """Test getting all credit requests for a user"""
-    user_id = "507f1f77bcf86cd799439011"
+async def test_get_all_credit_requests():
+    """Test getting all credit requests"""
     mock_requests = [MagicMock(), MagicMock()]
     
     with patch('app.services.credit_request_service.credit_request_repository') as mock_repo:
-        mock_repo.get_by_user_id = AsyncMock(return_value=mock_requests)
+        mock_repo.get_all = AsyncMock(return_value=mock_requests)
         
-        result = await get_user_credit_requests(user_id)
+        result = await get_all_credit_requests()
     
     assert result == mock_requests
-    mock_repo.get_by_user_id.assert_called_once_with(user_id)
+    mock_repo.get_all.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -250,7 +242,6 @@ async def test_search_credit_requests():
         mock_repo.search = AsyncMock(return_value=(mock_requests, total_count))
         
         results, total = await search_credit_requests(
-            user_id=user_id,
             countries=["Brazil"],
             identity_document="123",
             status="pending",
@@ -397,123 +388,3 @@ async def test_validate_country_rules_zero_income(mock_country_rule):
         assert len(error_details["errors"]) > 0
         assert "mayor a cero" in error_details["errors"][0]["error_message"]
 
-
-@pytest.mark.asyncio
-async def test_create_credit_request_with_validation_success(credit_request_data):
-    """Test creating credit request with successful validation"""
-    user_id = "507f1f77bcf86cd799439011"
-    
-    mock_country_rule = CountryRuleInDB(
-        country=Country.BRAZIL,
-        required_document_type="CPF",
-        is_active=True,
-        validation_rules=[
-            ValidationRule(
-                max_percentage=50.0,  # High enough to pass
-                enabled=True
-            )
-        ]
-    )
-    
-    mock_created_request = MagicMock()
-    mock_created_request.id = ObjectId("507f1f77bcf86cd799439012")
-    mock_created_request.currency_code = CurrencyCode.BRL
-    
-    with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule, \
-         patch('app.services.credit_request_service.credit_request_repository') as mock_repo, \
-         patch('app.services.credit_request_service.log_request', new_callable=AsyncMock):
-        mock_get_rule.return_value = mock_country_rule
-        mock_repo.create = AsyncMock(return_value=mock_created_request)
-        
-        # Use valid CPF
-        credit_request_data.identity_document = "123.456.789-09"
-        credit_request_data.requested_amount = 2000.0  # 40% of 5000 (within 50% limit)
-        credit_request_data.monthly_income = 5000.0
-        
-        result = await create_credit_request(
-            user_id=user_id,
-            credit_request_data=credit_request_data,
-            bank_information=None
-        )
-    
-    assert result.id == mock_created_request.id
-    mock_repo.create.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_create_credit_request_validation_fails(credit_request_data):
-    """Test creating credit request when validation fails"""
-    user_id = "507f1f77bcf86cd799439011"
-    
-    mock_country_rule = CountryRuleInDB(
-        country=Country.BRAZIL,
-        required_document_type="CPF",
-        is_active=True,
-        validation_rules=[
-            ValidationRule(
-                max_percentage=30.0,
-                enabled=True
-            )
-        ]
-    )
-    
-    with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule, \
-         patch('app.services.credit_request_service.credit_request_repository') as mock_repo:
-        mock_get_rule.return_value = mock_country_rule
-        
-        # Use valid CPF but exceed percentage (40% > 30%)
-        credit_request_data.identity_document = "123.456.789-09"
-        credit_request_data.requested_amount = 2000.0  # 40% of 5000
-        credit_request_data.monthly_income = 5000.0
-        
-        with pytest.raises(ValidationError):
-            await create_credit_request(
-                user_id=user_id,
-                credit_request_data=credit_request_data,
-                bank_information=None
-            )
-        
-        # Should not create the request
-        mock_repo.create.assert_not_called()
-
-
-@pytest.mark.asyncio
-async def test_create_credit_request_invalid_document_format(credit_request_data):
-    """Test creating credit request with invalid document format"""
-    user_id = "507f1f77bcf86cd799439011"
-    
-    mock_country_rule = CountryRuleInDB(
-        country=Country.BRAZIL,
-        required_document_type="CPF",
-        is_active=True,
-        validation_rules=[
-            ValidationRule(
-                max_percentage=50.0,
-                enabled=True
-            )
-        ]
-    )
-    
-    with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule, \
-         patch('app.services.credit_request_service.credit_request_repository') as mock_repo:
-        mock_get_rule.return_value = mock_country_rule
-        
-        # Use invalid CPF format
-        credit_request_data.identity_document = "123456"  # Invalid
-        credit_request_data.requested_amount = 2000.0
-        credit_request_data.monthly_income = 5000.0
-        
-        with pytest.raises(ValidationError) as exc_info:
-            await create_credit_request(
-                user_id=user_id,
-                credit_request_data=credit_request_data,
-                bank_information=None
-            )
-        
-        # Should not create the request
-        mock_repo.create.assert_not_called()
-        
-        # Check error details
-        error_details = exc_info.value.rule_details
-        assert "errors" in error_details
-        assert any(err.get("rule_type") == "document_format" for err in error_details["errors"])

@@ -38,7 +38,9 @@
     "searchCreditRequests": "Search Credit Requests",
     "searchDescription": "Search and filter your credit requests",
     "audits": "Audits",
-    "auditsDescription": "Export credit request data to Excel with custom filters"
+    "auditsDescription": "Export credit request data to Excel with custom filters",
+    "logs": "Logs",
+    "logsDescription": "Query and export system logs by date, method and endpoint"
   },
   "header": {
     "logout": "Logout",
@@ -55,6 +57,7 @@
   },
   "creditRequest": {
     "createTitle": "Create Credit Request",
+    "requestNumber": "Request Number",
     "country": "Country",
     "selectCountry": "Select a country",
     "fullName": "Full Name",
@@ -159,7 +162,25 @@
   },
   "sidebar": {
     "home": "Home",
-    "manageCountryRules": "Manage Country Rules"
+    "manageCountryRules": "Manage Country Rules",
+    "testMode": "Test Mode"
+  },
+  "testMode": {
+    "title": "Test Mode",
+    "description": "This tool is designed to facilitate testing of the challenge. It allows you to generate test data and clean the database to restart tests.",
+    "generateButton": "Generate Credit Requests",
+    "clearButton": "Clear Credit Requests",
+    "generating": "Generating...",
+    "clearing": "Clearing...",
+    "generateSuccess": "{{count}} requests generated successfully",
+    "clearSuccess": "{{count}} requests deleted successfully",
+    "generateError": "Error generating requests",
+    "clearError": "Error clearing requests",
+    "confirmTitle": "Confirm",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "confirmGenerate": "Are you sure you want to generate 50 test credit requests?",
+    "confirmClear": "Are you sure you want to delete ALL credit requests? This action cannot be undone."
   },
   "countryRules": {
     "title": "Country Rules Management",
@@ -231,5 +252,41 @@
       "created_at": "Creation Date",
       "updated_at": "Update Date"
     }
+  },
+  "logs": {
+    "title": "System Logs",
+    "filters": "Filters",
+    "allMethods": "All Methods",
+    "method": "HTTP Method",
+    "module": "Module",
+    "allModules": "All Modules",
+    "modules": {
+      "creditRequests": "Credit Request",
+      "countryRules": "Country Rules",
+      "authentication": "Authentication",
+      "bankProvider": "Bank Provider",
+      "audits": "Audits",
+      "logs": "Logs"
+    },
+    "dateFrom": "Date From",
+    "dateTo": "Date To",
+    "search": "Search",
+    "resetFilters": "Reset Filters",
+    "loading": "Loading logs...",
+    "searchError": "Error searching logs",
+    "noResults": "No logs found",
+    "export": "Export to Excel",
+    "exporting": "Exporting...",
+    "exportError": "Error exporting logs",
+    "noDataFound": "No data found matching the selected filters",
+    "responseStatus": "Response Status",
+    "isSuccess": "Success",
+    "createdAt": "Created At",
+    "yes": "Yes",
+    "no": "No",
+    "showingResults": "Showing {{from}} to {{to}} of {{total}} results",
+    "pageOf": "Page {{page}} of {{total}}",
+    "previous": "Previous",
+    "next": "Next"
   }
 }

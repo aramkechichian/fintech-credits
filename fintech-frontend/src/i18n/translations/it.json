@@ -38,7 +38,9 @@
     "searchCreditRequests": "Cerca Richieste",
     "searchDescription": "Cerca e filtra le tue richieste di credito",
     "audits": "Audit",
-    "auditsDescription": "Esporta dati delle richieste di credito in Excel con filtri personalizzati"
+    "auditsDescription": "Esporta dati delle richieste di credito in Excel con filtri personalizzati",
+    "logs": "Log",
+    "logsDescription": "Consulta ed esporta log di sistema per data, metodo ed endpoint"
   },
   "header": {
     "logout": "Esci",
@@ -55,6 +57,7 @@
   },
   "creditRequest": {
     "createTitle": "Crea Richiesta di Credito",
+    "requestNumber": "Numero di Richiesta",
     "country": "Paese",
     "selectCountry": "Seleziona un paese",
     "fullName": "Nome Completo",
@@ -156,7 +159,25 @@
   },
   "sidebar": {
     "home": "Home",
-    "manageCountryRules": "Gestisci Regole Paesi"
+    "manageCountryRules": "Gestisci Regole Paesi",
+    "testMode": "Modalità Test"
+  },
+  "testMode": {
+    "title": "Modalità Test",
+    "description": "Questo strumento è progettato per facilitare i test della challenge. Consente di generare dati di test e pulire il database per riavviare i test.",
+    "generateButton": "Genera Richieste di Credito",
+    "clearButton": "Pulisci Richieste di Credito",
+    "generating": "Generazione...",
+    "clearing": "Pulizia...",
+    "generateSuccess": "{{count}} richieste generate con successo",
+    "clearSuccess": "{{count}} richieste eliminate con successo",
+    "generateError": "Errore nella generazione delle richieste",
+    "clearError": "Errore nella pulizia delle richieste",
+    "confirmTitle": "Conferma",
+    "confirm": "Conferma",
+    "cancel": "Annulla",
+    "confirmGenerate": "Sei sicuro di voler generare 50 richieste di credito di test?",
+    "confirmClear": "Sei sicuro di voler eliminare TUTTE le richieste di credito? Questa azione non può essere annullata."
   },
   "countryRules": {
     "title": "Gestione Regole Paesi",
@@ -228,5 +249,41 @@
       "created_at": "Data di Creazione",
       "updated_at": "Data di Aggiornamento"
     }
+  },
+  "logs": {
+    "title": "Log di Sistema",
+    "filters": "Filtri",
+    "allMethods": "Tutti i Metodi",
+    "method": "Metodo HTTP",
+    "module": "Modulo",
+    "allModules": "Tutti i Moduli",
+    "modules": {
+      "creditRequests": "Richiesta di Credito",
+      "countryRules": "Regole Paesi",
+      "authentication": "Autenticazione",
+      "bankProvider": "Fornitore Bancario",
+      "audits": "Audit",
+      "logs": "Log"
+    },
+    "dateFrom": "Data Da",
+    "dateTo": "Data A",
+    "search": "Cerca",
+    "resetFilters": "Reset Filtri",
+    "loading": "Caricamento log...",
+    "searchError": "Errore nella ricerca dei log",
+    "noResults": "Nessun log trovato",
+    "export": "Esporta in Excel",
+    "exporting": "Esportazione...",
+    "exportError": "Errore nell'esportazione dei log",
+    "noDataFound": "Nessun dato trovato che corrisponda ai filtri selezionati",
+    "responseStatus": "Stato Risposta",
+    "isSuccess": "Successo",
+    "createdAt": "Data di Creazione",
+    "yes": "Sì",
+    "no": "No",
+    "showingResults": "Mostrando {{from}} a {{to}} di {{total}} risultati",
+    "pageOf": "Pagina {{page}} di {{total}}",
+    "previous": "Precedente",
+    "next": "Successivo"
   }
 }

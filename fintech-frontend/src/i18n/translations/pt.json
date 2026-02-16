@@ -38,7 +38,9 @@
     "searchCreditRequests": "Consultar Solicitações",
     "searchDescription": "Busque e filtre suas solicitações de crédito",
     "audits": "Auditorias",
-    "auditsDescription": "Exporte dados de solicitações de crédito para Excel com filtros personalizados"
+    "auditsDescription": "Exporte dados de solicitações de crédito para Excel com filtros personalizados",
+    "logs": "Logs",
+    "logsDescription": "Consulte e exporte logs do sistema por data, método e endpoint"
   },
   "header": {
     "logout": "Sair",
@@ -55,6 +57,7 @@
   },
   "creditRequest": {
     "createTitle": "Criar Solicitação de Crédito",
+    "requestNumber": "Número de Solicitação",
     "country": "País",
     "selectCountry": "Selecione um país",
     "fullName": "Nome Completo",
@@ -158,7 +161,25 @@
   },
   "sidebar": {
     "home": "Início",
-    "manageCountryRules": "Gerenciar Regras de Países"
+    "manageCountryRules": "Gerenciar Regras de Países",
+    "testMode": "Modo de Teste"
+  },
+  "testMode": {
+    "title": "Modo de Teste",
+    "description": "Esta ferramenta foi projetada para facilitar os testes do challenge. Permite gerar dados de teste e limpar o banco de dados para reiniciar os testes.",
+    "generateButton": "Gerar Solicitações de Crédito",
+    "clearButton": "Limpar Solicitações de Crédito",
+    "generating": "Gerando...",
+    "clearing": "Limpando...",
+    "generateSuccess": "{{count}} solicitações geradas com sucesso",
+    "clearSuccess": "{{count}} solicitações eliminadas com sucesso",
+    "generateError": "Erro ao gerar solicitações",
+    "clearError": "Erro ao limpar solicitações",
+    "confirmTitle": "Confirmar",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "confirmGenerate": "Tem certeza de que deseja gerar 50 solicitações de crédito de teste?",
+    "confirmClear": "Tem certeza de que deseja eliminar TODAS as solicitações de crédito? Esta ação não pode ser desfeita."
   },
   "countryRules": {
     "title": "Gestão de Regras de Países",
@@ -230,5 +251,41 @@
       "created_at": "Data de Criação",
       "updated_at": "Data de Atualização"
     }
+  },
+  "logs": {
+    "title": "Logs do Sistema",
+    "filters": "Filtros",
+    "allMethods": "Todos os Métodos",
+    "method": "Método HTTP",
+    "module": "Módulo",
+    "allModules": "Todos os Módulos",
+    "modules": {
+      "creditRequests": "Solicitação de Crédito",
+      "countryRules": "Regras de Países",
+      "authentication": "Autenticação",
+      "bankProvider": "Provedor Bancário",
+      "audits": "Auditorias",
+      "logs": "Logs"
+    },
+    "dateFrom": "Data Desde",
+    "dateTo": "Data Até",
+    "search": "Buscar",
+    "resetFilters": "Limpar Filtros",
+    "loading": "Carregando logs...",
+    "searchError": "Erro ao buscar logs",
+    "noResults": "Nenhum log encontrado",
+    "export": "Exportar para Excel",
+    "exporting": "Exportando...",
+    "exportError": "Erro ao exportar logs",
+    "noDataFound": "Nenhum dado encontrado que corresponda aos filtros selecionados",
+    "responseStatus": "Status da Resposta",
+    "isSuccess": "Sucesso",
+    "createdAt": "Data de Criação",
+    "yes": "Sim",
+    "no": "Não",
+    "showingResults": "Mostrando {{from}} a {{to}} de {{total}} resultados",
+    "pageOf": "Página {{page}} de {{total}}",
+    "previous": "Anterior",
+    "next": "Próximo"
   }
 }
