@@ -97,9 +97,22 @@
     "detailTitle": "Detalhes da Solicitação de Crédito",
     "viewDetail": "Ver Detalhes",
     "consultBankSituation": "Consultar Situação Bancária",
+    "quickSearch": {
+      "button": "Consulta Rápida de Solicitação",
+      "title": "Consulta Rápida de Solicitação",
+      "requestIdLabel": "ID da Solicitação",
+      "requestIdPlaceholder": "Digite o ID da solicitação",
+      "search": "Buscar",
+      "errors": {
+        "requestIdRequired": "O ID da solicitação é obrigatório",
+        "requestNotFound": "Solicitação não encontrada ou você não tem permissão para visualizá-la",
+        "searchFailed": "Erro ao buscar a solicitação"
+      }
+    },
     "actions": "Ações",
     "approve": "Aprovar",
     "reject": "Rejeitar",
+    "putInReview": "Colocar em Revisão",
     "bankInformation": "Informações Bancárias",
     "bankName": "Banco",
     "accountNumber": "Número da Conta",
@@ -116,7 +129,9 @@
     "accountNumber": "Número da Conta",
     "statusUpdate": {
       "approved": "Solicitação aprovada com sucesso",
-      "rejected": "Solicitação rejeitada"
+      "rejected": "Solicitação rejeitada",
+      "inReview": "Solicitação colocada em revisão",
+      "inReviewNotification": "A solicitação foi colocada em revisão. O usuário está sendo notificado por email."
     },
     "errors": {
       "countryRequired": "Você deve selecionar um país",

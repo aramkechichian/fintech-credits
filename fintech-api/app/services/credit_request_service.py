@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional, List, Dict, Any
 from bson import ObjectId
 import logging
+import asyncio
 from app.models.credit_request import (
     CreditRequestCreate,
     CreditRequestInDB,
@@ -268,17 +269,20 @@ async def update_credit_request_status(
     
     updated_request = await credit_request_repository.update(request_id, update_data)
     
-    # TODO: Send email notification to user when status changes to approved or rejected
-    # if updated_request and new_status in [CreditRequestStatus.APPROVED, CreditRequestStatus.REJECTED]:
-    #     # Get user email from user_id
-    #     from app.repositories.user_repository import user_repository
-    #     user = await user_repository.get_by_id(str(updated_request.user_id))
-    #     if user:
-    #         await send_email(
-    #             to=user.email,
-    #             subject=f"Credit Request {new_status.value}",
-    #             body=f"Your credit request has been {new_status.value}."
-    #         )
+    # Send email notification asynchronously when status changes
+    if updated_request and new_status in [CreditRequestStatus.IN_REVIEW, CreditRequestStatus.APPROVED, CreditRequestStatus.REJECTED]:
+        from app.services.email_service import send_credit_request_status_notification
+        # Send email asynchronously (fire and forget)
+        asyncio.create_task(
+            send_credit_request_status_notification(
+                email=updated_request.email,
+                full_name=updated_request.full_name,
+                status=new_status.value,
+                request_id=str(updated_request.id),
+                country=updated_request.country.value if hasattr(updated_request.country, 'value') else str(updated_request.country)
+            )
+        )
+        logger.info(f"Email notification queued for credit request {request_id} with status {new_status.value} to {updated_request.email}")
     
     return updated_request
 

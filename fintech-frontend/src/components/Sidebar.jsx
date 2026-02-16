@@ -1,6 +1,6 @@
 import { useTranslation } from "../i18n/I18nContext";
 
-export default function Sidebar({ currentRoute, onNavigate }) {
+export default function Sidebar({ currentRoute, onNavigate, onOpenQuickSearch }) {
   const { t } = useTranslation();
 
   const menuItems = [
@@ -16,6 +16,12 @@ export default function Sidebar({ currentRoute, onNavigate }) {
       icon: "🌍",
       route: "country-rules",
     },
+    {
+      id: "quick-search",
+      label: t("creditRequest.quickSearch.button"),
+      icon: "🔍",
+      action: "quick-search",
+    },
   ];
 
   return (
@@ -27,7 +33,9 @@ export default function Sidebar({ currentRoute, onNavigate }) {
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  if (onNavigate) {
+                  if (item.action === "quick-search" && onOpenQuickSearch) {
+                    onOpenQuickSearch();
+                  } else if (item.route && onNavigate) {
                     onNavigate(item.route);
                   }
                 }}

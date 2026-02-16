@@ -331,6 +331,8 @@ async def update_request(
             message = "Solicitud de crédito aprobada exitosamente"
         elif new_status == CreditRequestStatus.REJECTED:
             message = "Solicitud de crédito rechazada"
+        elif new_status == CreditRequestStatus.IN_REVIEW:
+            message = "Solicitud de crédito puesta en revisión. Se está notificando al usuario por email."
         else:
             message = "Solicitud de crédito actualizada exitosamente"
         

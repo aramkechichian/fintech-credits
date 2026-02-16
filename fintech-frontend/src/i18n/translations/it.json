@@ -97,9 +97,22 @@
     "detailTitle": "Dettagli della Richiesta di Credito",
     "viewDetail": "Visualizza Dettagli",
     "consultBankSituation": "Consulta Situazione Bancaria",
+    "quickSearch": {
+      "button": "Ricerca Rapida Richiesta",
+      "title": "Ricerca Rapida Richiesta",
+      "requestIdLabel": "ID Richiesta",
+      "requestIdPlaceholder": "Inserisci l'ID della richiesta",
+      "search": "Cerca",
+      "errors": {
+        "requestIdRequired": "L'ID della richiesta è obbligatorio",
+        "requestNotFound": "Richiesta non trovata o non hai il permesso di visualizzarla",
+        "searchFailed": "Errore nella ricerca della richiesta"
+      }
+    },
     "actions": "Azioni",
     "approve": "Approva",
     "reject": "Rifiuta",
+    "putInReview": "Metti in Revisione",
     "bankInformation": "Informazioni Bancarie",
     "bankName": "Banca",
     "accountNumber": "Numero di Conto",

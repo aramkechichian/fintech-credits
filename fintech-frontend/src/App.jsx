@@ -8,10 +8,17 @@ import CreditRequestsListPage from "./pages/CreditRequestsListPage";
 import CountryRulesPage from "./pages/CountryRulesPage";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
+import QuickSearchModal from "./components/QuickSearchModal";
+import CreditRequestDetailModal from "./components/CreditRequestDetailModal";
+import { creditRequestApi } from "./api/creditRequestApi";
+import { translateError } from "./utils/errorTranslator";
 
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
   const { t } = useTranslation();
+  const [isQuickSearchModalOpen, setIsQuickSearchModalOpen] = useState(false);
+  const [selectedRequestId, setSelectedRequestId] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [route, setRoute] = useState(() => {
     if (typeof window !== "undefined") {
       const path = window.location.pathname;
@@ -34,6 +41,18 @@ function AppContent() {
     
     // Update route state
     setRoute(nextRoute);
+  };
+
+  const handleQuickSearch = async (requestId) => {
+    // Validate that the request exists and belongs to the user
+    try {
+      await creditRequestApi.getById(requestId);
+      setSelectedRequestId(requestId);
+      setIsDetailModalOpen(true);
+      setIsQuickSearchModalOpen(false);
+    } catch (err) {
+      throw new Error(translateError(err.message, t) || t("creditRequest.quickSearch.errors.requestNotFound"));
+    }
   };
 
   // Update route when authentication state changes
@@ -140,11 +159,36 @@ function AppContent() {
     <div className="min-h-screen bg-zinc-100 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
       <Header />
       <div className="flex">
-        <Sidebar currentRoute={route} onNavigate={handleNavigate} />
+        <Sidebar 
+          currentRoute={route} 
+          onNavigate={handleNavigate}
+          onOpenQuickSearch={() => setIsQuickSearchModalOpen(true)}
+        />
         <main className="flex-1 ml-64 px-8 py-8 max-w-full">
           {Page}
         </main>
       </div>
+      
+      <QuickSearchModal
+        isOpen={isQuickSearchModalOpen}
+        onClose={() => setIsQuickSearchModalOpen(false)}
+        onSearch={handleQuickSearch}
+      />
+      
+      <CreditRequestDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedRequestId(null);
+        }}
+        requestId={selectedRequestId}
+        onUpdate={() => {
+          // Refresh the page if we're on the search page
+          if (route === "search") {
+            window.dispatchEvent(new Event("locationchange"));
+          }
+        }}
+      />
     </div>
   );
 }

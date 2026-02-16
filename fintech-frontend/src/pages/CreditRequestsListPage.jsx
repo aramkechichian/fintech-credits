@@ -155,16 +155,18 @@ export default function CreditRequestsListPage() {
   return (
     <div className="p-8">
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4">
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
             {t("creditRequest.listTitle")}
           </h1>
-          <Button
-            variant="outline"
-            onClick={() => (window.location.href = "/")}
-          >
-            {t("creditRequest.backToHome")}
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = "/")}
+            >
+              {t("creditRequest.backToHome")}
+            </Button>
+          </div>
         </div>
 
         {hasFilters && (

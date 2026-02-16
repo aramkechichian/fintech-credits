@@ -60,29 +60,29 @@ export default function CreditRequestDetailModal({ isOpen, onClose, requestId, o
       const message = response.message || t(`creditRequest.statusUpdate.${newStatus}`);
 
       setRequest(updatedRequest);
+      
+      // Show notification message based on status
+      let toastMessage = message;
+      if (newStatus === "in_review") {
+        toastMessage = t("creditRequest.statusUpdate.inReviewNotification");
+      }
+      
       setToast({
         isVisible: true,
-        message: message,
+        message: toastMessage,
         type: "success",
       });
-
-      // TODO: Send email notification to user when status changes to approved or rejected
-      // if (newStatus === "approved" || newStatus === "rejected") {
-      //   await sendEmail({
-      //     to: user.email,
-      //     subject: `Credit Request ${newStatus}`,
-      //     body: `Your credit request has been ${newStatus}.`
-      //   });
-      // }
 
       if (onUpdate) {
         onUpdate(updatedRequest);
       }
 
-      // Close modal after a short delay
-      setTimeout(() => {
-        onClose();
-      }, 1500);
+      // Close modal after a short delay (only for approve/reject, not for in_review)
+      if (newStatus === "approved" || newStatus === "rejected") {
+        setTimeout(() => {
+          onClose();
+        }, 1500);
+      }
     } catch (err) {
       const errorMessage = translateError(err.message, t);
       setError(errorMessage || t("creditRequest.errors.updateFailed"));
@@ -111,6 +111,7 @@ export default function CreditRequestDetailModal({ isOpen, onClose, requestId, o
 
   const canApprove = request?.status === "pending" || request?.status === "in_review";
   const canReject = request?.status === "pending" || request?.status === "in_review";
+  const canPutInReview = request?.status === "pending";
 
   return (
     <>
@@ -226,8 +227,18 @@ export default function CreditRequestDetailModal({ isOpen, onClose, requestId, o
             )}
 
             {/* Action Buttons */}
-            {(canApprove || canReject) && (
+            {(canPutInReview || canApprove || canReject) && (
               <div className="flex gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+                {canPutInReview && (
+                  <Button
+                    onClick={() => handleStatusUpdate("in_review")}
+                    disabled={updating}
+                    variant="outline"
+                    className="flex-1 border-blue-300 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                  >
+                    {updating ? <Spinner /> : t("creditRequest.putInReview")}
+                  </Button>
+                )}
                 {canApprove && (
                   <Button
                     onClick={() => handleStatusUpdate("approved")}

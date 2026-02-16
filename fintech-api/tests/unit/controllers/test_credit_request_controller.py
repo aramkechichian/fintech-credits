@@ -299,3 +299,25 @@ async def test_search_requests_empty(mock_user):
     assert len(result["items"]) == 0
     mock_search.assert_called_once()
     # Note: log_request was removed from search endpoint
+
+
+@pytest.mark.asyncio
+async def test_get_request_forbidden(mock_user, mock_credit_request):
+    """Test getting a credit request that belongs to another user"""
+    request_id = "507f1f77bcf86cd799439012"
+    # Create a different user ID
+    different_user_id = ObjectId("507f1f77bcf86cd799439099")
+    mock_credit_request.user_id = different_user_id
+    
+    with patch('app.controllers.credit_request_controller.get_credit_request_by_id', new_callable=AsyncMock) as mock_get:
+        mock_get.return_value = mock_credit_request
+        
+        with pytest.raises(HTTPException) as exc_info:
+            await credit_request_controller.get_request(
+                request_id=request_id,
+                current_user=mock_user
+            )
+        
+        assert exc_info.value.status_code == status.HTTP_403_FORBIDDEN
+        assert "permission" in exc_info.value.detail.lower()
+        mock_get.assert_called_once_with(request_id)

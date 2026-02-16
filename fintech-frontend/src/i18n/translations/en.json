@@ -97,9 +97,22 @@
     "detailTitle": "Credit Request Details",
     "viewDetail": "View Detail",
     "consultBankSituation": "Consult Bank Situation",
+    "quickSearch": {
+      "button": "Quick Request Search",
+      "title": "Quick Request Search",
+      "requestIdLabel": "Request ID",
+      "requestIdPlaceholder": "Enter the request ID",
+      "search": "Search",
+      "errors": {
+        "requestIdRequired": "Request ID is required",
+        "requestNotFound": "Request not found or you don't have permission to view it",
+        "searchFailed": "Error searching for request"
+      }
+    },
     "actions": "Actions",
     "approve": "Approve",
     "reject": "Reject",
+    "putInReview": "Put in Review",
     "bankInformation": "Bank Information",
     "bankName": "Bank",
     "accountNumber": "Account Number",
@@ -115,7 +128,9 @@
     },
     "statusUpdate": {
       "approved": "Request approved successfully",
-      "rejected": "Request rejected"
+      "rejected": "Request rejected",
+      "inReview": "Request put in review",
+      "inReviewNotification": "The request has been put in review. The user is being notified by email."
     },
     "errors": {
       "countryRequired": "You must select a country",
