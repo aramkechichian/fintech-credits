@@ -183,7 +183,9 @@ fintech-challenge/
 
 ### Variables de Entorno (Backend)
 
-Las variables de entorno son **opcionales** ya que el sistema tiene valores por defecto. Solo necesitas crear un archivo `.env` en `fintech-api/` si quieres personalizar la configuración:
+**El proyecto incluye un archivo `.env` de prueba** en `fintech-api/` que puedes usar directamente. Este archivo contiene la configuración necesaria para ejecutar el proyecto en modo desarrollo.
+
+Si necesitas personalizar la configuración, puedes editar el archivo `.env` existente o crear uno nuevo. Las variables disponibles son:
 
 ```bash
 # MongoDB (opcional, default: mongodb://localhost:27017)
@@ -202,7 +204,7 @@ SMTP_FROM_EMAIL=noreply@fintech.com
 SMTP_USE_TLS=true
 ```
 
-**Nota**: Si no creas el archivo `.env`, la aplicación funcionará con los valores por defecto. Solo necesitas configurar SMTP si quieres que se envíen emails de notificación.
+**Nota**: El archivo `.env` incluido en el proyecto es para fines de prueba y desarrollo. Para producción, asegúrate de usar valores seguros y no exponer credenciales sensibles.
 
 ### Requisitos Previos
 
