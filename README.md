@@ -183,12 +183,17 @@ fintech-challenge/
 
 ### Variables de Entorno (Backend)
 
-Crea un archivo `.env` en `fintech-api/`:
+Las variables de entorno son **opcionales** ya que el sistema tiene valores por defecto. Solo necesitas crear un archivo `.env` en `fintech-api/` si quieres personalizar la configuración:
 
 ```bash
+# MongoDB (opcional, default: mongodb://localhost:27017)
 MONGODB_URL=mongodb://localhost:27017
+
+# JWT (opcional, tiene valores por defecto)
 FINTECH_JWT_SECRET_KEY=tu-clave-secreta-aqui
-FINTECH_JWT_ACCESS_TOKEN_EXPIRE_MINUTES=360  # 6 horas
+FINTECH_JWT_ACCESS_TOKEN_EXPIRE_MINUTES=360  # 6 horas (default)
+
+# SMTP para emails (opcional, solo si quieres enviar emails)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=tu-email@gmail.com
@@ -196,6 +201,8 @@ SMTP_PASSWORD=tu-app-password
 SMTP_FROM_EMAIL=noreply@fintech.com
 SMTP_USE_TLS=true
 ```
+
+**Nota**: Si no creas el archivo `.env`, la aplicación funcionará con los valores por defecto. Solo necesitas configurar SMTP si quieres que se envíen emails de notificación.
 
 ### Requisitos Previos
 
