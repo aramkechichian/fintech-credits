@@ -30,6 +30,7 @@ def credit_request_data():
     return CreditRequestCreate(
         country=Country.BRAZIL,
         full_name="John Doe",
+        email="john.doe@example.com",
         identity_document="123456789",
         requested_amount=10000.0,
         monthly_income=5000.0
@@ -118,6 +119,7 @@ async def test_create_credit_request_currency_mapping():
         credit_request_data = CreditRequestCreate(
             country=country,
             full_name="Test User",
+            email="test@example.com",
             identity_document="123456789",
             requested_amount=10000.0,
             monthly_income=5000.0

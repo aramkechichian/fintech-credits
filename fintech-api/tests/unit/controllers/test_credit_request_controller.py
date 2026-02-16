@@ -38,6 +38,7 @@ def credit_request_data():
     return CreditRequestCreate(
         country=Country.BRAZIL,
         full_name="John Doe",
+        email="john.doe@example.com",
         identity_document="123456789",
         requested_amount=10000.0,
         monthly_income=5000.0
@@ -54,6 +55,7 @@ def mock_credit_request():
         country=Country.BRAZIL,
         currency_code=CurrencyCode.BRL,
         full_name="John Doe",
+        email="john.doe@example.com",
         identity_document="123456789",
         requested_amount=10000.0,
         monthly_income=5000.0,

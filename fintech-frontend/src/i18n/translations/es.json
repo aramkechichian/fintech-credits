@@ -57,6 +57,8 @@
     "selectCountry": "Selecciona un país",
     "fullName": "Nombre Completo",
     "fullNamePlaceholder": "Ingresa tu nombre completo",
+    "email": "Email",
+    "emailPlaceholder": "Ingresa tu email",
     "identityDocument": "Documento de Identidad",
     "identityDocumentPlaceholder": "Ingresa documento de identidad",
     "requestedAmount": "Monto Solicitado",
@@ -118,6 +120,8 @@
     "errors": {
       "countryRequired": "Debes seleccionar un país",
       "fullNameRequired": "El nombre completo es requerido",
+      "emailRequired": "El email es requerido",
+      "emailInvalid": "El formato del email no es válido",
       "identityDocumentRequired": "El documento de identidad es requerido",
       "amountRequired": "El monto solicitado debe ser mayor a 0",
       "incomeRequired": "El ingreso mensual debe ser mayor a 0",

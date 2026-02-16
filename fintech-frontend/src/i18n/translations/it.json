@@ -57,6 +57,8 @@
     "selectCountry": "Seleziona un paese",
     "fullName": "Nome Completo",
     "fullNamePlaceholder": "Inserisci il tuo nome completo",
+    "email": "Email",
+    "emailPlaceholder": "Inserisci la tua email",
     "identityDocument": "Documento di Identità",
     "identityDocumentPlaceholder": "Inserisci documento di identità",
     "requestedAmount": "Importo Richiesto",

@@ -57,6 +57,8 @@
     "selectCountry": "Selecione um país",
     "fullName": "Nome Completo",
     "fullNamePlaceholder": "Digite seu nome completo",
+    "email": "Email",
+    "emailPlaceholder": "Digite seu email",
     "identityDocument": "Documento de Identidade",
     "identityDocumentPlaceholder": "Digite documento de identidade",
     "requestedAmount": "Valor Solicitado",

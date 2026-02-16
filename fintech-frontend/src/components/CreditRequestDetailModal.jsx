@@ -162,6 +162,13 @@ export default function CreditRequestDetailModal({ isOpen, onClose, requestId, o
 
               <div>
                 <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-1">
+                  {t("creditRequest.email")}
+                </label>
+                <p className="text-zinc-900 dark:text-zinc-50">{request.email}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-1">
                   {t("creditRequest.identityDocument")}
                 </label>
                 <p className="text-zinc-900 dark:text-zinc-50">{request.identity_document}</p>

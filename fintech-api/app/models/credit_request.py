@@ -48,6 +48,7 @@ class BankInformation(BaseModel):
 class CreditRequestBase(BaseModel):
     country: Country
     full_name: str = Field(..., min_length=1, max_length=200)
+    email: str = Field(..., min_length=1, max_length=200, pattern=r'^[^@]+@[^@]+\.[^@]+$')
     identity_document: str = Field(..., min_length=1, max_length=50)
     requested_amount: float = Field(..., gt=0)
     monthly_income: float = Field(..., gt=0)

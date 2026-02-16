@@ -21,6 +21,7 @@ export default function CreateCreditRequestModal({ isOpen, onClose, onSuccess })
   const [formData, setFormData] = useState({
     country: "",
     full_name: "",
+    email: "",
     identity_document: "",
     requested_amount: "",
     monthly_income: "",
@@ -53,6 +54,16 @@ export default function CreateCreditRequestModal({ isOpen, onClose, onSuccess })
       setError(t("creditRequest.errors.fullNameRequired"));
       return;
     }
+    if (!formData.email || formData.email.trim().length === 0) {
+      setError(t("creditRequest.errors.emailRequired"));
+      return;
+    }
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email.trim())) {
+      setError(t("creditRequest.errors.emailInvalid"));
+      return;
+    }
     if (!formData.identity_document || formData.identity_document.trim().length === 0) {
       setError(t("creditRequest.errors.identityDocumentRequired"));
       return;
@@ -74,6 +85,7 @@ export default function CreateCreditRequestModal({ isOpen, onClose, onSuccess })
       const requestData = {
         country: formData.country,
         full_name: formData.full_name.trim(),
+        email: formData.email.trim(),
         identity_document: formData.identity_document.trim(),
         requested_amount: requestedAmount,
         monthly_income: monthlyIncome,
@@ -85,6 +97,7 @@ export default function CreateCreditRequestModal({ isOpen, onClose, onSuccess })
       setFormData({
         country: "",
         full_name: "",
+        email: "",
         identity_document: "",
         requested_amount: "",
         monthly_income: "",
@@ -114,6 +127,7 @@ export default function CreateCreditRequestModal({ isOpen, onClose, onSuccess })
       setFormData({
         country: "",
         full_name: "",
+        email: "",
         identity_document: "",
         requested_amount: "",
         monthly_income: "",
@@ -223,6 +237,20 @@ export default function CreateCreditRequestModal({ isOpen, onClose, onSuccess })
             onChange={handleChange}
             required
             placeholder={t("creditRequest.fullNamePlaceholder")}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            {t("creditRequest.email")} *
+          </label>
+          <Input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            placeholder={t("creditRequest.emailPlaceholder")}
           />
         </div>
 

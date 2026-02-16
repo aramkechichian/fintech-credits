@@ -230,6 +230,9 @@ export default function CreditRequestsListPage() {
                       {t("creditRequest.fullName")}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                      {t("creditRequest.email")}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                       {t("creditRequest.identityDocument")}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
@@ -257,6 +260,9 @@ export default function CreditRequestsListPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-50">
                         {request.full_name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-50">
+                        {request.email}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-50">
                         {request.identity_document}

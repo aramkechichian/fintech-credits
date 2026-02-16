@@ -180,6 +180,7 @@ async def create_credit_request(
         country=credit_request_data.country,
         currency_code=currency_code,
         full_name=credit_request_data.full_name,
+        email=credit_request_data.email,
         identity_document=credit_request_data.identity_document,
         requested_amount=credit_request_data.requested_amount,
         monthly_income=credit_request_data.monthly_income,
@@ -204,6 +205,7 @@ async def create_credit_request(
             payload={
                 "country": credit_request_data.country.value if hasattr(credit_request_data.country, 'value') else str(credit_request_data.country),
                 "full_name": credit_request_data.full_name,
+                "email": credit_request_data.email,
                 "identity_document": credit_request_data.identity_document,
                 "requested_amount": credit_request_data.requested_amount,
                 "monthly_income": credit_request_data.monthly_income,
