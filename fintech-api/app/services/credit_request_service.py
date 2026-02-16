@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from bson import ObjectId
 import logging
 from app.models.credit_request import (
@@ -13,8 +13,107 @@ from app.models.credit_request import (
 )
 from app.repositories.credit_request_repository import credit_request_repository
 from app.services.log_service import log_request
+from app.services.country_rule_service import get_country_rule_by_country
+from app.models.country_rule import ValidationRule
+from app.utils.document_validator import validate_document_format
 
 logger = logging.getLogger(__name__)
+
+
+class ValidationError(Exception):
+    """Custom exception for validation errors with rule details"""
+    def __init__(self, message: str, rule_details: Optional[Dict[str, Any]] = None):
+        self.message = message
+        self.rule_details = rule_details or {}
+        super().__init__(self.message)
+
+
+async def validate_country_rules(
+    country: Country,
+    identity_document: str,
+    requested_amount: float,
+    monthly_income: float
+) -> None:
+    """
+    Validate credit request against country rules
+    
+    Raises:
+        ValidationError: If validation fails, includes rule details
+    """
+    # Get country rule
+    country_rule = await get_country_rule_by_country(country)
+    
+    if not country_rule:
+        logger.warning(f"No country rule found for {country}, skipping validation")
+        return
+    
+    if not country_rule.is_active:
+        logger.info(f"Country rule for {country} is inactive, skipping validation")
+        return
+    
+    # Validate document format first
+    validation_errors: List[Dict[str, Any]] = []
+    
+    # Validate document format
+    is_valid_doc, doc_error = validate_document_format(
+        country=country,
+        document_type=country_rule.required_document_type,
+        document=identity_document
+    )
+    
+    if not is_valid_doc:
+        error_detail = {
+            "rule_type": "document_format",
+            "required_document_type": country_rule.required_document_type,
+            "provided_document": identity_document,
+            "error_message": doc_error or f"El formato del documento {country_rule.required_document_type} no es válido"
+        }
+        validation_errors.append(error_detail)
+    
+    for rule in country_rule.validation_rules:
+        if not rule.enabled:
+            continue
+        
+        # Validate amount vs income ratio
+        if monthly_income > 0:
+            percentage = (requested_amount / monthly_income) * 100
+            
+            if percentage > rule.max_percentage:
+                error_detail = {
+                    "rule_type": "amount_to_income_ratio",
+                    "max_percentage": rule.max_percentage,
+                    "requested_percentage": round(percentage, 2),
+                    "requested_amount": requested_amount,
+                    "monthly_income": monthly_income,
+                    "error_message": rule.error_message or f"El monto solicitado ({requested_amount}) excede el {rule.max_percentage}% del ingreso mensual ({monthly_income}). Porcentaje calculado: {round(percentage, 2)}%"
+                }
+                validation_errors.append(error_detail)
+        else:
+            # If monthly income is 0 or negative, this is invalid
+            error_detail = {
+                "rule_type": "amount_to_income_ratio",
+                "max_percentage": rule.max_percentage,
+                "requested_percentage": None,
+                "requested_amount": requested_amount,
+                "monthly_income": monthly_income,
+                "error_message": "El ingreso mensual debe ser mayor a cero"
+            }
+            validation_errors.append(error_detail)
+    
+    # If there are validation errors, raise exception with details
+    if validation_errors:
+        error_messages = [err["error_message"] for err in validation_errors]
+        main_message = "La solicitud no cumple con las reglas de validación del país"
+        
+        raise ValidationError(
+            message=main_message,
+            rule_details={
+                "country": country.value,
+                "required_document_type": country_rule.required_document_type,
+                "errors": validation_errors,
+                "summary": "; ".join(error_messages)
+            }
+        )
 
 async def create_credit_request(
     user_id: str,
@@ -25,6 +124,7 @@ async def create_credit_request(
     Create a new credit request
     
     This function triggers additional logic:
+    - Country rules validation
     - Risk validation
     - Audit logging
     - Background processing
@@ -48,6 +148,19 @@ async def create_credit_request(
         except ValueError:
             logger.error(f"Invalid country value: {country_enum}")
             raise ValueError(f"Invalid country: {country_enum}")
+    
+        # Validate against country rules BEFORE creating the request
+    try:
+        await validate_country_rules(
+            country=country_enum,
+            identity_document=credit_request_data.identity_document,
+            requested_amount=credit_request_data.requested_amount,
+            monthly_income=credit_request_data.monthly_income
+        )
+    except ValidationError as e:
+        logger.warning(f"Credit request validation failed for user {user_id}: {e.message}")
+        # Re-raise the validation error with details
+        raise
     
     # Get currency code from map
     currency_code = COUNTRY_CURRENCY_MAP.get(country_enum)

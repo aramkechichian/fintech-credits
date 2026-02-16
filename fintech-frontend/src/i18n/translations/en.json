@@ -113,8 +113,16 @@
       "getAllFailed": "Error retrieving credit requests",
       "getByIdFailed": "Error retrieving credit request",
       "searchFailed": "Error searching credit requests",
-      "updateFailed": "Error updating credit request"
-    }
+      "updateFailed": "Error updating credit request",
+      "validationFailed": "The request does not meet the validation rules"
+    },
+    "validationDetails": {
+      "title": "Validation Details",
+      "ruleViolated": "Rule violated",
+      "maxPercentage": "Maximum allowed percentage",
+      "requestedPercentage": "Requested percentage"
+    },
+    "requiredDocument": "Required document"
   },
   "sidebar": {
     "home": "Home",

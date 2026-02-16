@@ -113,8 +113,16 @@
       "getAllFailed": "Error al obtener las solicitudes de crédito",
       "getByIdFailed": "Error al obtener la solicitud de crédito",
       "searchFailed": "Error al buscar solicitudes de crédito",
-      "updateFailed": "Error al actualizar la solicitud de crédito"
-    }
+      "updateFailed": "Error al actualizar la solicitud de crédito",
+      "validationFailed": "La solicitud no cumple con las reglas de validación"
+    },
+    "validationDetails": {
+      "title": "Detalles de la validación",
+      "ruleViolated": "Regla violada",
+      "maxPercentage": "Porcentaje máximo permitido",
+      "requestedPercentage": "Porcentaje solicitado"
+    },
+    "requiredDocument": "Documento requerido"
   },
   "sidebar": {
     "home": "Inicio",

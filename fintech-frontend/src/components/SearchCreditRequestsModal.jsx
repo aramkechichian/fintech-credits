@@ -62,9 +62,18 @@ export default function SearchCreditRequestsModal({ isOpen, onClose }) {
       params.append("status", filters.status);
     }
     
-    // Navigate to search results page
+    // Navigate to search results page using history API (no page reload)
     const queryString = params.toString();
-    window.location.href = `/credit-requests/search${queryString ? `?${queryString}` : ""}`;
+    const searchUrl = `/credit-requests/search${queryString ? `?${queryString}` : ""}`;
+    
+    // Update URL - this will trigger the useEffect in App.jsx that syncs route with URL
+    window.history.pushState({ route: "search" }, "", searchUrl);
+    
+    // Close modal
+    onClose();
+    
+    // Force route update by dispatching a custom event
+    window.dispatchEvent(new Event("locationchange"));
   };
 
   const handleReset = () => {

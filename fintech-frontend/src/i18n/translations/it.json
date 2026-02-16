@@ -113,8 +113,16 @@
       "getAllFailed": "Errore nel recupero delle richieste di credito",
       "getByIdFailed": "Errore nel recupero della richiesta di credito",
       "searchFailed": "Errore nella ricerca delle richieste di credito",
-      "updateFailed": "Errore nell'aggiornamento della richiesta di credito"
-    }
+      "updateFailed": "Errore nell'aggiornamento della richiesta di credito",
+      "validationFailed": "La richiesta non soddisfa le regole di validazione"
+    },
+    "validationDetails": {
+      "title": "Dettagli della Validazione",
+      "ruleViolated": "Regola violata",
+      "maxPercentage": "Percentuale massima consentita",
+      "requestedPercentage": "Percentuale richiesta"
+    },
+    "requiredDocument": "Documento richiesto"
   },
   "sidebar": {
     "home": "Home",

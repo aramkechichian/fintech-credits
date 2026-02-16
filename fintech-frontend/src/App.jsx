@@ -16,12 +16,23 @@ function AppContent() {
     if (typeof window !== "undefined") {
       const path = window.location.pathname;
       if (path.startsWith("/credit-requests/search")) return "search";
+      if (path === "/country-rules") return "country-rules";
       if (path === "/" || path === "/home") return "home";
     }
     return isAuthenticated ? "home" : "login";
   });
 
   const handleNavigate = (nextRoute) => {
+    // Update browser URL first
+    if (nextRoute === "home") {
+      window.history.pushState({ route: nextRoute }, "", "/");
+    } else if (nextRoute === "country-rules") {
+      window.history.pushState({ route: nextRoute }, "", "/country-rules");
+    } else if (nextRoute === "search") {
+      window.history.pushState({ route: nextRoute }, "", "/credit-requests/search");
+    }
+    
+    // Update route state
     setRoute(nextRoute);
   };
 
@@ -34,12 +45,14 @@ function AppContent() {
     }
   }, [isAuthenticated, route]);
 
-  // Handle browser navigation
+  // Handle browser navigation (back/forward buttons)
   useEffect(() => {
     const handlePopState = () => {
       const path = window.location.pathname;
       if (path.startsWith("/credit-requests/search")) {
         setRoute("search");
+      } else if (path === "/country-rules") {
+        setRoute("country-rules");
       } else if (path === "/" || path === "/home") {
         setRoute("home");
       }
@@ -49,6 +62,40 @@ function AppContent() {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
+  // Sync route with URL changes (for programmatic navigation)
+  useEffect(() => {
+    const updateRouteFromUrl = () => {
+      const path = window.location.pathname;
+      let newRoute = null;
+      
+      if (path.startsWith("/credit-requests/search")) {
+        newRoute = "search";
+      } else if (path === "/country-rules") {
+        newRoute = "country-rules";
+      } else if (path === "/" || path === "/home") {
+        newRoute = "home";
+      }
+      
+      // Update route if we determined a new route from URL
+      if (newRoute) {
+        setRoute((currentRoute) => {
+          // Only update if actually different
+          return currentRoute !== newRoute ? newRoute : currentRoute;
+        });
+      }
+    };
+
+    // Listen for custom locationchange event
+    window.addEventListener("locationchange", updateRouteFromUrl);
+    
+    // Also check on mount
+    updateRouteFromUrl();
+    
+    return () => {
+      window.removeEventListener("locationchange", updateRouteFromUrl);
+    };
+  }, []); // Empty deps - only run on mount and when locationchange event fires
+
   const Page = useMemo(() => {
     if (!isAuthenticated) {
       if (route === "register") {
@@ -57,7 +104,7 @@ function AppContent() {
       return <LoginPage onNavigate={handleNavigate} />;
     }
 
-    if (route === "search" || window.location.pathname.startsWith("/credit-requests/search")) {
+    if (route === "search") {
       return <CreditRequestsListPage />;
     }
 

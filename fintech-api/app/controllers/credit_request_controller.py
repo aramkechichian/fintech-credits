@@ -16,7 +16,8 @@ from app.services.credit_request_service import (
     get_credit_request_by_id,
     get_user_credit_requests,
     update_credit_request_status,
-    search_credit_requests
+    search_credit_requests,
+    ValidationError
 )
 from app.services.log_service import log_request
 from app.controllers.auth_controller import get_current_user_dependency
@@ -76,6 +77,27 @@ async def create_request(
         )
         
         return response
+    except ValidationError as e:
+        logger.warning(f"Validation error creating credit request: {e.message}")
+        # Log error
+        await log_request(
+            endpoint="/credit-requests",
+            method="POST",
+            user_id=str(current_user.id),
+            payload=credit_request_data.model_dump() if credit_request_data else None,
+            response_status=400,
+            is_success=False,
+            error_message=e.message
+        )
+        # Return detailed validation error with rule details
+        # FastAPI will serialize the dict to JSON automatically
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "message": e.message,
+                "rule_details": e.rule_details
+            }
+        )
     except ValueError as e:
         logger.warning(f"Validation error creating credit request: {str(e)}")
         # Log error
@@ -163,22 +185,6 @@ async def search_requests(
             limit=limit
         )
         
-        # Log the search
-        await log_request(
-            endpoint="/credit-requests/search",
-            method="GET",
-            user_id=str(current_user.id),
-            payload={
-                "countries": countries,
-                "identity_document": identity_document,
-                "status": status_filter,
-                "page": page,
-                "limit": limit
-            },
-            response_status=200,
-            is_success=True
-        )
-        
         return {
             "items": [
                 CreditRequestResponse(
@@ -205,22 +211,6 @@ async def search_requests(
         }
     except Exception as e:
         logger.error(f"Error searching credit requests: {str(e)}", exc_info=True)
-        # Log error
-        await log_request(
-            endpoint="/credit-requests/search",
-            method="GET",
-            user_id=str(current_user.id),
-            payload={
-                "countries": countries,
-                "identity_document": identity_document,
-                "status": status_filter,
-                "page": page,
-                "limit": limit
-            },
-            response_status=500,
-            is_success=False,
-            error_message=str(e)
-        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error searching credit requests"

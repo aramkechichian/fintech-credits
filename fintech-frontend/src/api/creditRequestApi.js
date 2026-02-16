@@ -39,7 +39,15 @@ export const creditRequestApi = {
         error = { detail: errorText || "Error al crear la solicitud de crédito" };
       }
       
-      // Handle validation errors
+      // Handle country rules validation errors (400 with rule_details)
+      if (response.status === 400 && error.detail && typeof error.detail === "object" && error.detail.rule_details) {
+        // Create a structured error with validation details
+        const validationError = new Error(error.detail.message || "La solicitud no cumple con las reglas de validación");
+        validationError.ruleDetails = error.detail.rule_details;
+        throw validationError;
+      }
+      
+      // Handle validation errors (422)
       if (response.status === 422 && error.detail) {
         let errorMessage = "Error de validación: ";
         if (Array.isArray(error.detail)) {

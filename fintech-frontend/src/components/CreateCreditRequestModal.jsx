@@ -26,6 +26,7 @@ export default function CreateCreditRequestModal({ isOpen, onClose, onSuccess })
     monthly_income: "",
   });
   const [error, setError] = useState("");
+  const [validationDetails, setValidationDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -35,11 +36,13 @@ export default function CreateCreditRequestModal({ isOpen, onClose, onSuccess })
       [name]: value,
     }));
     setError("");
+    setValidationDetails(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setValidationDetails(null);
 
     // Validation
     if (!formData.country) {
@@ -92,8 +95,15 @@ export default function CreateCreditRequestModal({ isOpen, onClose, onSuccess })
         onSuccess();
       }
     } catch (err) {
-      const errorMessage = translateError(err.message, t);
-      setError(errorMessage || t("creditRequest.errors.createFailed"));
+      // Check if this is a validation error with rule details
+      if (err.ruleDetails) {
+        setValidationDetails(err.ruleDetails);
+        setError(err.message || t("creditRequest.errors.validationFailed"));
+      } else {
+        const errorMessage = translateError(err.message, t);
+        setError(errorMessage || t("creditRequest.errors.createFailed"));
+        setValidationDetails(null);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -109,6 +119,7 @@ export default function CreateCreditRequestModal({ isOpen, onClose, onSuccess })
         monthly_income: "",
       });
       setError("");
+      setValidationDetails(null);
       onClose();
     }
   };
@@ -122,8 +133,62 @@ export default function CreateCreditRequestModal({ isOpen, onClose, onSuccess })
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="p-3 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm">
-            {error}
+          <div className="space-y-2">
+            <div className="p-3 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm font-medium">
+              {error}
+            </div>
+            {validationDetails && (
+              <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                <div className="space-y-3">
+                  <div className="text-sm font-semibold text-red-800 dark:text-red-300">
+                    {t("creditRequest.validationDetails.title", "Detalles de la validación")}
+                  </div>
+                  {validationDetails.country && (
+                    <div className="text-xs text-red-700 dark:text-red-400">
+                      <span className="font-medium">{t("creditRequest.country", "País")}:</span> {validationDetails.country}
+                    </div>
+                  )}
+                  {validationDetails.required_document_type && (
+                    <div className="text-xs text-red-700 dark:text-red-400">
+                      <span className="font-medium">{t("creditRequest.requiredDocument", "Documento requerido")}:</span> {validationDetails.required_document_type}
+                    </div>
+                  )}
+                  {validationDetails.errors && validationDetails.errors.length > 0 && (
+                    <div className="space-y-2 mt-3">
+                      {validationDetails.errors.map((err, index) => (
+                        <div key={index} className="p-2 bg-white dark:bg-zinc-800 rounded border border-red-200 dark:border-red-700">
+                          <div className="text-xs font-medium text-red-800 dark:text-red-300 mb-1">
+                            {err.error_message || t("creditRequest.validationDetails.ruleViolated", "Regla violada")}
+                          </div>
+                          <div className="text-xs text-red-600 dark:text-red-400 space-y-1">
+                            {err.max_percentage !== undefined && (
+                              <div>
+                                <span className="font-medium">{t("creditRequest.validationDetails.maxPercentage", "Porcentaje máximo permitido")}:</span> {err.max_percentage}%
+                              </div>
+                            )}
+                            {err.requested_percentage !== undefined && err.requested_percentage !== null && (
+                              <div>
+                                <span className="font-medium">{t("creditRequest.validationDetails.requestedPercentage", "Porcentaje solicitado")}:</span> {err.requested_percentage}%
+                              </div>
+                            )}
+                            {err.requested_amount !== undefined && (
+                              <div>
+                                <span className="font-medium">{t("creditRequest.requestedAmount", "Monto solicitado")}:</span> {err.requested_amount.toLocaleString()}
+                              </div>
+                            )}
+                            {err.monthly_income !== undefined && (
+                              <div>
+                                <span className="font-medium">{t("creditRequest.monthlyIncome", "Ingreso mensual")}:</span> {err.monthly_income.toLocaleString()}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
