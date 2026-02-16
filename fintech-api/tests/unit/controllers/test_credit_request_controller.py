@@ -258,8 +258,7 @@ async def test_search_requests_success(mock_user, mock_credit_request):
     mock_requests = [mock_credit_request]
     total_count = 1
     
-    with patch('app.controllers.credit_request_controller.search_credit_requests', new_callable=AsyncMock) as mock_search, \
-         patch('app.controllers.credit_request_controller.log_request', new_callable=AsyncMock) as mock_log:
+    with patch('app.controllers.credit_request_controller.search_credit_requests', new_callable=AsyncMock) as mock_search:
         mock_search.return_value = (mock_requests, total_count)
         
         result = await credit_request_controller.search_requests(
@@ -276,14 +275,13 @@ async def test_search_requests_success(mock_user, mock_credit_request):
     assert result["page"] == 1
     assert result["limit"] == 20
     mock_search.assert_called_once()
-    mock_log.assert_called_once()
+    # Note: log_request was removed from search endpoint
 
 
 @pytest.mark.asyncio
 async def test_search_requests_empty(mock_user):
     """Test searching credit requests with no results"""
-    with patch('app.controllers.credit_request_controller.search_credit_requests', new_callable=AsyncMock) as mock_search, \
-         patch('app.controllers.credit_request_controller.log_request', new_callable=AsyncMock) as mock_log:
+    with patch('app.controllers.credit_request_controller.search_credit_requests', new_callable=AsyncMock) as mock_search:
         mock_search.return_value = ([], 0)
         
         result = await credit_request_controller.search_requests(
@@ -298,3 +296,4 @@ async def test_search_requests_empty(mock_user):
     assert result["total"] == 0
     assert len(result["items"]) == 0
     mock_search.assert_called_once()
+    # Note: log_request was removed from search endpoint

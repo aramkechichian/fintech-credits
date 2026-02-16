@@ -17,8 +17,11 @@ from app.services.credit_request_service import (
     get_credit_request_by_id,
     get_user_credit_requests,
     update_credit_request_status,
-    search_credit_requests
+    search_credit_requests,
+    validate_country_rules,
+    ValidationError
 )
+from app.models.country_rule import CountryRuleInDB, ValidationRule
 
 
 @pytest.fixture
@@ -49,8 +52,11 @@ async def test_create_credit_request_success(credit_request_data):
     mock_created_request.monthly_income = 5000.0
     mock_created_request.status = CreditRequestStatus.PENDING
     
-    with patch('app.services.credit_request_service.credit_request_repository') as mock_repo, \
+    with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule, \
+         patch('app.services.credit_request_service.credit_request_repository') as mock_repo, \
          patch('app.services.credit_request_service.log_request', new_callable=AsyncMock) as mock_log:
+        # Mock no country rule found (validation passes)
+        mock_get_rule.return_value = None
         mock_repo.create = AsyncMock(return_value=mock_created_request)
         
         result = await create_credit_request(
@@ -79,8 +85,11 @@ async def test_create_credit_request_with_bank_info(credit_request_data):
     mock_created_request.id = ObjectId("507f1f77bcf86cd799439012")
     mock_created_request.bank_information = bank_info
     
-    with patch('app.services.credit_request_service.credit_request_repository') as mock_repo, \
+    with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule, \
+         patch('app.services.credit_request_service.credit_request_repository') as mock_repo, \
          patch('app.services.credit_request_service.log_request', new_callable=AsyncMock):
+        # Mock no country rule found (validation passes)
+        mock_get_rule.return_value = None
         mock_repo.create = AsyncMock(return_value=mock_created_request)
         
         result = await create_credit_request(
@@ -117,8 +126,11 @@ async def test_create_credit_request_currency_mapping():
         mock_created_request = MagicMock()
         mock_created_request.currency_code = expected_currency
         
-        with patch('app.services.credit_request_service.credit_request_repository') as mock_repo, \
+        with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule, \
+             patch('app.services.credit_request_service.credit_request_repository') as mock_repo, \
              patch('app.services.credit_request_service.log_request', new_callable=AsyncMock):
+            # Mock no country rule found (validation passes)
+            mock_get_rule.return_value = None
             mock_repo.create = AsyncMock(return_value=mock_created_request)
             
             result = await create_credit_request(
@@ -247,3 +259,259 @@ async def test_search_credit_requests():
     assert results == mock_requests
     assert total == total_count
     mock_repo.search.assert_called_once()
+
+
+# Tests for country rules validation
+@pytest.fixture
+def mock_country_rule():
+    """Create a mock country rule for testing"""
+    return CountryRuleInDB(
+        country=Country.BRAZIL,
+        required_document_type="CPF",
+        description="Test rule",
+        is_active=True,
+        validation_rules=[
+            ValidationRule(
+                max_percentage=30.0,
+                enabled=True,
+                error_message="El monto solicitado no puede exceder el 30% del ingreso mensual"
+            )
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_validate_country_rules_success(mock_country_rule):
+    """Test successful country rules validation"""
+    with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule:
+        mock_get_rule.return_value = mock_country_rule
+        
+        # Valid CPF and valid percentage (20% of income)
+        await validate_country_rules(
+            country=Country.BRAZIL,
+            identity_document="123.456.789-09",
+            requested_amount=1000.0,  # 20% of 5000
+            monthly_income=5000.0
+        )
+        
+        # Should not raise any exception
+        mock_get_rule.assert_called_once_with(Country.BRAZIL)
+
+
+@pytest.mark.asyncio
+async def test_validate_country_rules_no_rule_found():
+    """Test validation when no country rule exists (should pass)"""
+    with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule:
+        mock_get_rule.return_value = None
+        
+        # Should not raise exception when no rule exists
+        await validate_country_rules(
+            country=Country.BRAZIL,
+            identity_document="123.456.789-09",
+            requested_amount=10000.0,
+            monthly_income=5000.0
+        )
+
+
+@pytest.mark.asyncio
+async def test_validate_country_rules_inactive_rule(mock_country_rule):
+    """Test validation when country rule is inactive (should pass)"""
+    mock_country_rule.is_active = False
+    
+    with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule:
+        mock_get_rule.return_value = mock_country_rule
+        
+        # Should not raise exception when rule is inactive
+        await validate_country_rules(
+            country=Country.BRAZIL,
+            identity_document="123.456.789-09",
+            requested_amount=10000.0,
+            monthly_income=5000.0
+        )
+
+
+@pytest.mark.asyncio
+async def test_validate_country_rules_invalid_document_format(mock_country_rule):
+    """Test validation failure due to invalid document format"""
+    with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule:
+        mock_get_rule.return_value = mock_country_rule
+        
+        # Invalid CPF format
+        with pytest.raises(ValidationError) as exc_info:
+            await validate_country_rules(
+                country=Country.BRAZIL,
+                identity_document="123456",  # Invalid CPF
+                requested_amount=1000.0,
+                monthly_income=5000.0
+            )
+        
+        error_details = exc_info.value.rule_details
+        assert "errors" in error_details
+        assert len(error_details["errors"]) > 0
+        assert error_details["errors"][0].get("rule_type") == "document_format"
+        assert exc_info.value.message == "La solicitud no cumple con las reglas de validación del país"
+
+
+@pytest.mark.asyncio
+async def test_validate_country_rules_exceeds_percentage(mock_country_rule):
+    """Test validation failure due to exceeding max percentage"""
+    with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule:
+        mock_get_rule.return_value = mock_country_rule
+        
+        # Requested amount is 40% of income (exceeds 30% max)
+        with pytest.raises(ValidationError) as exc_info:
+            await validate_country_rules(
+                country=Country.BRAZIL,
+                identity_document="123.456.789-09",
+                requested_amount=2000.0,  # 40% of 5000
+                monthly_income=5000.0
+            )
+        
+        error_details = exc_info.value.rule_details
+        assert error_details["country"] == "Brazil"
+        assert "errors" in error_details
+        assert len(error_details["errors"]) > 0
+        assert error_details["errors"][0]["rule_type"] == "amount_to_income_ratio"
+        assert error_details["errors"][0]["max_percentage"] == 30.0
+        assert error_details["errors"][0]["requested_percentage"] == 40.0
+
+
+@pytest.mark.asyncio
+async def test_validate_country_rules_zero_income(mock_country_rule):
+    """Test validation failure when monthly income is zero"""
+    with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule:
+        mock_get_rule.return_value = mock_country_rule
+        
+        with pytest.raises(ValidationError) as exc_info:
+            await validate_country_rules(
+                country=Country.BRAZIL,
+                identity_document="123.456.789-09",
+                requested_amount=1000.0,
+                monthly_income=0.0
+            )
+        
+        error_details = exc_info.value.rule_details
+        assert "errors" in error_details
+        assert len(error_details["errors"]) > 0
+        assert "mayor a cero" in error_details["errors"][0]["error_message"]
+
+
+@pytest.mark.asyncio
+async def test_create_credit_request_with_validation_success(credit_request_data):
+    """Test creating credit request with successful validation"""
+    user_id = "507f1f77bcf86cd799439011"
+    
+    mock_country_rule = CountryRuleInDB(
+        country=Country.BRAZIL,
+        required_document_type="CPF",
+        is_active=True,
+        validation_rules=[
+            ValidationRule(
+                max_percentage=50.0,  # High enough to pass
+                enabled=True
+            )
+        ]
+    )
+    
+    mock_created_request = MagicMock()
+    mock_created_request.id = ObjectId("507f1f77bcf86cd799439012")
+    mock_created_request.currency_code = CurrencyCode.BRL
+    
+    with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule, \
+         patch('app.services.credit_request_service.credit_request_repository') as mock_repo, \
+         patch('app.services.credit_request_service.log_request', new_callable=AsyncMock):
+        mock_get_rule.return_value = mock_country_rule
+        mock_repo.create = AsyncMock(return_value=mock_created_request)
+        
+        # Use valid CPF
+        credit_request_data.identity_document = "123.456.789-09"
+        credit_request_data.requested_amount = 2000.0  # 40% of 5000 (within 50% limit)
+        credit_request_data.monthly_income = 5000.0
+        
+        result = await create_credit_request(
+            user_id=user_id,
+            credit_request_data=credit_request_data,
+            bank_information=None
+        )
+    
+    assert result.id == mock_created_request.id
+    mock_repo.create.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_create_credit_request_validation_fails(credit_request_data):
+    """Test creating credit request when validation fails"""
+    user_id = "507f1f77bcf86cd799439011"
+    
+    mock_country_rule = CountryRuleInDB(
+        country=Country.BRAZIL,
+        required_document_type="CPF",
+        is_active=True,
+        validation_rules=[
+            ValidationRule(
+                max_percentage=30.0,
+                enabled=True
+            )
+        ]
+    )
+    
+    with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule, \
+         patch('app.services.credit_request_service.credit_request_repository') as mock_repo:
+        mock_get_rule.return_value = mock_country_rule
+        
+        # Use valid CPF but exceed percentage (40% > 30%)
+        credit_request_data.identity_document = "123.456.789-09"
+        credit_request_data.requested_amount = 2000.0  # 40% of 5000
+        credit_request_data.monthly_income = 5000.0
+        
+        with pytest.raises(ValidationError):
+            await create_credit_request(
+                user_id=user_id,
+                credit_request_data=credit_request_data,
+                bank_information=None
+            )
+        
+        # Should not create the request
+        mock_repo.create.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_create_credit_request_invalid_document_format(credit_request_data):
+    """Test creating credit request with invalid document format"""
+    user_id = "507f1f77bcf86cd799439011"
+    
+    mock_country_rule = CountryRuleInDB(
+        country=Country.BRAZIL,
+        required_document_type="CPF",
+        is_active=True,
+        validation_rules=[
+            ValidationRule(
+                max_percentage=50.0,
+                enabled=True
+            )
+        ]
+    )
+    
+    with patch('app.services.credit_request_service.get_country_rule_by_country', new_callable=AsyncMock) as mock_get_rule, \
+         patch('app.services.credit_request_service.credit_request_repository') as mock_repo:
+        mock_get_rule.return_value = mock_country_rule
+        
+        # Use invalid CPF format
+        credit_request_data.identity_document = "123456"  # Invalid
+        credit_request_data.requested_amount = 2000.0
+        credit_request_data.monthly_income = 5000.0
+        
+        with pytest.raises(ValidationError) as exc_info:
+            await create_credit_request(
+                user_id=user_id,
+                credit_request_data=credit_request_data,
+                bank_information=None
+            )
+        
+        # Should not create the request
+        mock_repo.create.assert_not_called()
+        
+        # Check error details
+        error_details = exc_info.value.rule_details
+        assert "errors" in error_details
+        assert any(err.get("rule_type") == "document_format" for err in error_details["errors"])
