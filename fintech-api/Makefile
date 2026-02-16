@@ -1,10 +1,10 @@
 install:
-	pip3 install --upgrade pip setuptools wheel
-	pip3 install -e .
+	python3 -m pip install --upgrade pip setuptools wheel
+	python3 -m pip install -e .
 
 install-dev:
-	pip3 install --upgrade pip setuptools wheel
-	pip3 install -e ".[dev]"
+	python3 -m pip install --upgrade pip setuptools wheel
+	python3 -m pip install -e ".[dev]"
 
 mongo-up:
 	@echo "Starting MongoDB..."
