@@ -20,9 +20,14 @@ export function translateError(errorMessage, t) {
     "Could not validate credentials": "errors.sessionExpired",
     "User not found": "errors.userNotFound",
     "Incorrect email or password": "login.error",
+    "Error logging in": "login.error",
+    "Error al iniciar sesión": "login.error",
+    "User account is inactive": "login.accountInactive",
     "Error registering user": "register.error",
     "Error getting user": "errors.getUserFailed",
     "Error al obtener información del usuario": "errors.getUserFailed",
+    "No se pudo conectar con el servidor": "errors.serverConnection",
+    "No se pudo conectar con el servidor. Por favor, verifica que el servidor esté corriendo.": "errors.serverConnection",
   };
 
   // Check if error message matches a key in the map

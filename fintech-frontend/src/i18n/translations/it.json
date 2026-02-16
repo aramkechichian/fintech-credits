@@ -9,7 +9,8 @@
     "submit": "Accedi",
     "noAccount": "Non hai un account?",
     "registerLink": "Registrati qui",
-    "error": "Email o password non validi"
+    "error": "Email o password non validi",
+    "accountInactive": "Il tuo account è inattivo. Per favore, contatta l'amministratore."
   },
   "register": {
     "title": "Crea Account",
@@ -53,7 +54,8 @@
     "mustBeLoggedIn": "Devi essere loggato",
     "sessionExpired": "La tua sessione è scaduta. Per favore, accedi di nuovo.",
     "userNotFound": "Utente non trovato",
-    "getUserFailed": "Errore nel recupero delle informazioni dell'utente"
+    "getUserFailed": "Errore nel recupero delle informazioni dell'utente",
+    "serverConnection": "Impossibile connettersi al server. Per favore, verifica che il server sia in esecuzione."
   },
   "creditRequest": {
     "createTitle": "Crea Richiesta di Credito",

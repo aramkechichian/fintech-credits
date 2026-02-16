@@ -9,7 +9,8 @@
     "submit": "Iniciar Sesión",
     "noAccount": "¿No tienes una cuenta?",
     "registerLink": "Regístrate aquí",
-    "error": "Correo o contraseña inválidos"
+    "error": "Correo o contraseña inválidos",
+    "accountInactive": "Tu cuenta está inactiva. Por favor, contacta al administrador."
   },
   "register": {
     "title": "Crear Cuenta",
@@ -53,7 +54,8 @@
     "mustBeLoggedIn": "Debes iniciar sesión",
     "sessionExpired": "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
     "userNotFound": "Usuario no encontrado",
-    "getUserFailed": "Error al obtener información del usuario"
+    "getUserFailed": "Error al obtener información del usuario",
+    "serverConnection": "No se pudo conectar con el servidor. Por favor, verifica que el servidor esté corriendo."
   },
   "creditRequest": {
     "createTitle": "Crear Solicitud de Crédito",

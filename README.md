@@ -32,6 +32,18 @@ El backend estará disponible en `http://localhost:8000` y el frontend en `http:
 
 > **Nota**: Al ejecutar `make up`, el sistema crea automáticamente el usuario administrador si no existe.
 
+### 📖 Documentación de la API (Swagger)
+
+La documentación interactiva de la API está disponible en:
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
+
+Desde estas interfaces puedes:
+- Ver todos los endpoints disponibles
+- Probar los endpoints directamente desde el navegador
+- Ver los modelos de datos y esquemas
+- Autenticarte usando el botón "Authorize" con tu token JWT
+
 ---
 
 ## 📋 Módulos del Sistema

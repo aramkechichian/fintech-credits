@@ -107,9 +107,28 @@ export const authApi = {
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: "Error logging in" }));
-        console.error("[authApi] Login error:", error);
-        throw new Error(error.detail || "Error logging in");
+        let errorDetail = "Error al iniciar sesión";
+        try {
+          const error = await response.json();
+          errorDetail = error.detail || error.message || errorDetail;
+          console.error("[authApi] Login error:", error);
+        } catch (parseError) {
+          // If response is not JSON, try to get text
+          try {
+            const errorText = await response.text();
+            errorDetail = errorText || errorDetail;
+          } catch (textError) {
+            // If all else fails, use status-based message
+            if (response.status === 401) {
+              errorDetail = "Incorrect email or password";
+            } else if (response.status === 403) {
+              errorDetail = "User account is inactive";
+            } else {
+              errorDetail = `Error al iniciar sesión (${response.status})`;
+            }
+          }
+        }
+        throw new Error(errorDetail);
       }
 
       const data = await response.json();

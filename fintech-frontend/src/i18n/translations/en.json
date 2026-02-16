@@ -9,7 +9,8 @@
     "submit": "Sign In",
     "noAccount": "Don't have an account?",
     "registerLink": "Register here",
-    "error": "Invalid email or password"
+    "error": "Invalid email or password",
+    "accountInactive": "Your account is inactive. Please contact the administrator."
   },
   "register": {
     "title": "Create Account",
@@ -53,7 +54,8 @@
     "mustBeLoggedIn": "You must be logged in",
     "sessionExpired": "Your session has expired. Please log in again.",
     "userNotFound": "User not found",
-    "getUserFailed": "Error getting user information"
+    "getUserFailed": "Error getting user information",
+    "serverConnection": "Could not connect to the server. Please verify that the server is running."
   },
   "creditRequest": {
     "createTitle": "Create Credit Request",

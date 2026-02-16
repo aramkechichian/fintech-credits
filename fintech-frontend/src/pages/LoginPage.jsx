@@ -24,8 +24,20 @@ export default function LoginPage({ onNavigate }) {
       await login(email, password);
       // Redirect will happen automatically via AuthContext
     } catch (err) {
-      const errorMessage = translateError(err.message, t);
-      setError(errorMessage || t("login.error"));
+      console.error("Login error:", err);
+      // Always show an error message
+      let errorMessage = "";
+      
+      if (err && err.message) {
+        errorMessage = translateError(err.message, t);
+      }
+      
+      // If no message was translated or found, use default
+      if (!errorMessage || errorMessage === err?.message) {
+        errorMessage = t("login.error") || "Error al iniciar sesión. Por favor, verifica tus credenciales.";
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
